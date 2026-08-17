@@ -101,16 +101,14 @@ export const DroneLocationSetupPage: React.FC = () => {
     const availableSlots = 8 - photos.length;
     const filesToAdd = newFiles.slice(0, availableSlots);
 
-    const newPhotos: SurroundingsPhotoDraft[] = filesToAdd.map((file, idx) => {
-      return {
-        id: Math.random().toString(36).substring(7),
-        source: 'upload',
-        file,
-        previewUrl: URL.createObjectURL(file),
-        capturedAt: new Date().toISOString(),
-        sequence: photos.length + 1 + idx
-      };
-    });
+    const newPhotos: SurroundingsPhotoDraft[] = filesToAdd.map((file: File, idx: number) => ({
+      id: Math.random().toString(36).substring(7),
+      source: 'upload',
+      file,
+      previewUrl: URL.createObjectURL(file),
+      capturedAt: new Date().toISOString(),
+      sequence: photos.length + 1 + idx
+    }));
 
     setPhotos(prev => [...prev, ...newPhotos]);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -154,6 +152,7 @@ export const DroneLocationSetupPage: React.FC = () => {
         latitude: location.latitude,
         longitude: location.longitude,
         gpsAccuracy: location.accuracy,
+        address: `${locationName} — ${location.latitude.toFixed(4)}°N, ${location.longitude.toFixed(4)}°E`,
         status: 'verified',
         isDefault: true,
         clearanceScore: 100,

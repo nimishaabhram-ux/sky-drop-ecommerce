@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { Package, ChevronRight, Clock } from 'lucide-react';
 import { ordersApi } from '../services/ordersApi';
 import { Order } from '../types';
+import { formatCurrency } from '../utils/currency';
 
 export const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'current' | 'past'>('current');
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -30,10 +32,33 @@ export const OrdersPage: React.FC = () => {
     return <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-blue-200">In Progress</span>;
   };
 
+  const currentOrders = orders.filter(o => o.status !== 'DELIVERED' && o.status !== 'CANCELLED');
+  const pastOrders = orders.filter(o => o.status === 'DELIVERED' || o.status === 'CANCELLED');
+  const displayOrders = activeTab === 'current' ? currentOrders : pastOrders;
+
   return (
     <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-6 md:py-8 min-h-screen">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Your Orders</h1>
       <p className="text-gray-500 mb-8">View and track your recent orders.</p>
+
+      <div className="flex border-b border-gray-200 mb-6">
+        <button
+          onClick={() => setActiveTab('current')}
+          className={`pb-4 px-6 font-bold text-sm transition-colors border-b-2 ${
+            activeTab === 'current' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          Current Orders ({currentOrders.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('past')}
+          className={`pb-4 px-6 font-bold text-sm transition-colors border-b-2 ${
+            activeTab === 'past' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          Past Orders ({pastOrders.length})
+        </button>
+      </div>
 
       {isLoading ? (
         <div className="space-y-4">
@@ -41,20 +66,24 @@ export const OrdersPage: React.FC = () => {
             <div key={i} className="h-32 bg-gray-100 animate-pulse rounded-3xl"></div>
           ))}
         </div>
-      ) : orders.length === 0 ? (
+      ) : displayOrders.length === 0 ? (
         <div className="text-center py-24 bg-gray-50 rounded-3xl border border-gray-100">
           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-gray-100">
             <Package className="w-10 h-10 text-gray-300" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">No orders yet</h3>
-          <p className="text-gray-500 mb-8">Looks like you haven't placed any orders.</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">No {activeTab} orders</h3>
+          <p className="text-gray-500 mb-8">
+            {activeTab === 'current' 
+              ? "You don't have any active orders right now." 
+              : "You haven't completed any orders yet."}
+          </p>
           <Link to="/shop" className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-bold rounded-2xl text-white bg-blue-600 hover:bg-blue-700 shadow-md">
             Start Shopping
           </Link>
         </div>
       ) : (
         <div className="space-y-5">
-          {orders.map(order => (
+          {displayOrders.map(order => (
             <Link key={order.id} to={`/orders/${order.id}`} className="block group">
               <div className="bg-white rounded-3xl border border-gray-100 p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex flex-col md:flex-row gap-4 md:gap-6 justify-between items-start md:items-center">
@@ -71,7 +100,7 @@ export const OrdersPage: React.FC = () => {
                       </span>
                       <span>{order.items.length} {order.items.length === 1 ? 'item' : 'items'}</span>
                       <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
-                      <span className="font-bold text-gray-900">${order.totalAmount.toFixed(2)}</span>
+                      <span className="font-bold text-gray-900">{formatCurrency(order.totalAmount)}</span>
                     </div>
                   </div>
 

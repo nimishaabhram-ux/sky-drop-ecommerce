@@ -36,6 +36,7 @@ export interface DeliveryLocation {
   longitude: number;
   gpsAccuracy: number; // in meters
   altitude?: number; // in meters
+  address?: string; // human-readable address string
   status: 'verified' | 'pending_verification' | 'action_required';
   isDefault: boolean;
   clearanceScore: number; // 0 - 100
@@ -93,12 +94,47 @@ export interface Product {
   weightGrams: number;
   dimensionsCm: { width: number; height: number; depth: number };
   imageUrl: string;
+  imageUrls?: string[];
   rating: number;
   reviewsCount: number;
   prepTimeMinutes: number;
   isDroneOptimized: boolean;
   inStock: boolean;
   tags: string[];
+}
+
+export interface ProductReviewImage {
+  id: string;
+  url: string;
+}
+
+export interface ProductReview {
+  id: string;
+  productId: string;
+  userId?: string;
+  userName: string;
+  userAvatarUrl?: string;
+  rating: number;
+  description: string;
+  images: ProductReviewImage[];
+  createdAt: string;
+  verifiedPurchase: boolean;
+}
+
+export interface DeliveryAddress {
+  id: string;
+  userId: string;
+  label: 'Home' | 'Work' | 'Other';
+  recipientName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: 'India';
+  isDefault: boolean;
 }
 
 export interface CartItem {
@@ -135,6 +171,8 @@ export interface Order {
   deliveryMethod: 'drone' | 'standard';
   deliveryLocationId?: string;
   deliveryLocation?: DeliveryLocation;
+  deliveryAddressId?: string;
+  deliveryAddress?: DeliveryAddress;
   totalWeightGrams: number;
   subtotal: number;
   deliveryFee: number;
@@ -148,7 +186,7 @@ export interface Order {
   trackingNumber: string;
   droneId?: string;
   deliveryNotes?: string;
-  paymentMethod: 'card' | 'apple_pay' | 'google_pay';
+  paymentMethod: 'card' | 'apple_pay' | 'google_pay' | 'UPI' | 'COD';
 }
 
 export interface FlightWeather {

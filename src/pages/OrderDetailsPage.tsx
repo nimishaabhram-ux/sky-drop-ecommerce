@@ -4,6 +4,7 @@ import { Package, Truck, Zap, MapPin, ArrowLeft, ArrowRight, CheckCircle2 } from
 import { ordersApi } from '../services/ordersApi';
 import { Order } from '../types';
 import { Button } from '../components/common/Button';
+import { formatCurrency } from '../utils/currency';
 
 export const OrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -169,7 +170,7 @@ export const OrderDetailsPage: React.FC = () => {
               </div>
               <div className="text-right shrink-0">
                 <span className="font-bold text-gray-900">
-                  ${(item.product.price * item.quantity).toFixed(2)}
+                  {formatCurrency(item.product.price * item.quantity)}
                 </span>
               </div>
             </li>
@@ -183,26 +184,26 @@ export const OrderDetailsPage: React.FC = () => {
         <div className="space-y-4 font-medium mb-6">
           <div className="flex justify-between text-gray-600">
             <span>Subtotal</span>
-            <span className="text-gray-900">${order.subtotal.toFixed(2)}</span>
+            <span className="text-gray-900">{formatCurrency(order.subtotal)}</span>
           </div>
           <div className="flex justify-between text-gray-600">
             <span>Delivery Fee</span>
-            <span className="text-gray-900">${order.deliveryFee.toFixed(2)}</span>
+            <span className="text-gray-900">{formatCurrency(order.deliveryFee)}</span>
           </div>
           {order.dronePriorityFee > 0 && (
             <div className="flex justify-between text-cyan-700 bg-cyan-50 px-3 py-2 rounded-lg -mx-3">
               <span className="flex items-center gap-1.5"><Zap className="w-4 h-4"/> Drone Priority Fee</span>
-              <span className="font-bold">${order.dronePriorityFee.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(order.dronePriorityFee)}</span>
             </div>
           )}
           <div className="flex justify-between text-gray-600">
             <span>Tax</span>
-            <span className="text-gray-900">${order.tax.toFixed(2)}</span>
+            <span className="text-gray-900">{formatCurrency(order.tax)}</span>
           </div>
         </div>
         <div className="flex justify-between items-center pt-6 border-t border-gray-100">
           <span className="font-bold text-gray-900 text-lg">Total Paid</span>
-          <span className="text-3xl font-black text-gray-900">${order.totalAmount.toFixed(2)}</span>
+          <span className="text-3xl font-black text-gray-900">{formatCurrency(order.totalAmount)}</span>
         </div>
       </div>
     </div>

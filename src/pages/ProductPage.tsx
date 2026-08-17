@@ -4,6 +4,9 @@ import { Star, ArrowLeft, Minus, Plus, Truck, Zap, AlertCircle } from 'lucide-re
 import { INITIAL_PRODUCTS } from '../data/mockData';
 import { Button } from '../components/common/Button';
 import { useCart } from '../context/CartContext';
+import { formatCurrency } from '../utils/currency';
+import { ProductReviewsList } from '../components/reviews/ProductReviewsList';
+import { RecommendedProducts } from '../components/products/RecommendedProducts';
 
 export const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -75,11 +78,11 @@ export const ProductPage: React.FC = () => {
 
           <div className="flex items-end gap-3 mb-6">
             <span className="text-4xl font-extrabold text-gray-900">
-              ${product.price.toFixed(2)}
+              {formatCurrency(product.price)}
             </span>
             {product.originalPrice && (
               <span className="text-xl text-gray-400 line-through mb-1">
-                ${product.originalPrice.toFixed(2)}
+                {formatCurrency(product.originalPrice)}
               </span>
             )}
           </div>
@@ -155,11 +158,14 @@ export const ProductPage: React.FC = () => {
               onClick={handleAddToCart}
               disabled={!product.inStock}
             >
-              Add to cart - ${(product.price * quantity).toFixed(2)}
+              Add to cart - {formatCurrency(product.price * quantity)}
             </Button>
           </div>
         </div>
       </div>
+
+      <ProductReviewsList product={product} />
+      <RecommendedProducts currentProductId={product.id} category={product.category} />
     </div>
   );
 };

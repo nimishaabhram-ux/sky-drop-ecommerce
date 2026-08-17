@@ -4,25 +4,32 @@ import { ShieldCheck, ChevronRight, AlertCircle, Zap, Truck, MapPin } from 'luci
 import { useCart } from '../context/CartContext';
 import { locationsApi } from '../services/locationsApi';
 import { ordersApi } from '../services/ordersApi';
-import { DeliveryLocation } from '../types';
+import { addressesApi } from '../services/addressesApi';
+import { DeliveryLocation, DeliveryAddress } from '../types';
 import { Button } from '../components/common/Button';
+import { formatCurrency } from '../utils/currency';
+import { AddressCard } from '../components/addresses/AddressCard';
 
 export const CheckoutPage: React.FC = () => {
   const { cart, cartSubtotal, clearCart } = useCart();
   const navigate = useNavigate();
   
   const [locations, setLocations] = useState<DeliveryLocation[]>([]);
+  const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
   const [isLoadingLocations, setIsLoadingLocations] = useState(true);
   
   const [deliveryMethod, setDeliveryMethod] = useState<'standard' | 'drone'>('standard');
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CARD' | 'COD'>('UPI');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isDroneEligible = cart.length > 0 && cart.every(item => item.product.isDroneOptimized);
-  const deliveryFee = deliveryMethod === 'drone' ? 9.99 : 4.99;
-  const tax = cartSubtotal * 0.08;
-  const totalAmount = cartSubtotal + deliveryFee + tax;
+  const deliveryFee = deliveryMethod === 'drone' ? 0 : 49;
+  const dronePriorityFee = deliveryMethod === 'drone' ? 99 : 0;
+  const tax = Math.round(cartSubtotal * 0.18);
+  const totalAmount = cartSubtotal + deliveryFee + dronePriorityFee + tax;
 
   useEffect(() => {
     if (cart.length === 0) {
@@ -30,24 +37,37 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
-    const fetchLocations = async () => {
+    const fetchData = async () => {
       try {
-        const data = await locationsApi.getLocations();
-        setLocations(data);
-        const defaultLoc = data.find(l => l.isDefault);
+        const [locationsData, addressesData] = await Promise.all([
+          locationsApi.getLocations(),
+          addressesApi.getAll()
+        ]);
+        
+        setLocations(locationsData);
+        setAddresses(addressesData);
+        
+        const defaultLoc = locationsData.find(l => l.isDefault);
         if (defaultLoc) {
           setSelectedLocationId(defaultLoc.id);
-        } else if (data.length > 0) {
-          setSelectedLocationId(data[0].id);
+        } else if (locationsData.length > 0) {
+          setSelectedLocationId(locationsData[0].id);
+        }
+        
+        const defaultAddr = addressesData.find(a => a.isDefault);
+        if (defaultAddr) {
+          setSelectedAddressId(defaultAddr.id);
+        } else if (addressesData.length > 0) {
+          setSelectedAddressId(addressesData[0].id);
         }
       } catch (err) {
-        console.error("Failed to load locations", err);
+        console.error("Failed to load delivery data", err);
       } finally {
         setIsLoadingLocations(false);
       }
     };
 
-    fetchLocations();
+    fetchData();
   }, [cart.length, navigate]);
 
   useEffect(() => {
@@ -56,9 +76,19 @@ export const CheckoutPage: React.FC = () => {
     }
   }, [isDroneEligible, deliveryMethod]);
 
+  useEffect(() => {
+    if (deliveryMethod === 'drone' && paymentMethod === 'COD') {
+      setPaymentMethod('UPI');
+    }
+  }, [deliveryMethod, paymentMethod]);
+
   const handlePlaceOrder = async () => {
     if (deliveryMethod === 'drone' && !selectedLocationId) {
       setError("Please select a drone delivery location.");
+      return;
+    }
+    if (deliveryMethod === 'standard' && !selectedAddressId) {
+      setError("Please select a delivery address.");
       return;
     }
     
@@ -71,14 +101,15 @@ export const CheckoutPage: React.FC = () => {
         items: cart,
         deliveryMethod,
         deliveryLocationId: deliveryMethod === 'drone' ? selectedLocationId || undefined : undefined,
+        deliveryAddressId: deliveryMethod === 'standard' ? selectedAddressId || undefined : undefined,
         status: 'ORDER_PROCESSING',
         subtotal: cartSubtotal,
         deliveryFee,
-        dronePriorityFee: deliveryMethod === 'drone' ? 5 : 0,
+        dronePriorityFee,
         tax,
         totalAmount,
-        estimatedDeliveryMinutes: deliveryMethod === 'drone' ? 12 : 35,
-        paymentMethod: 'card'
+        estimatedDeliveryMinutes: deliveryMethod === 'drone' ? 12 : 1440,
+        paymentMethod
       });
 
       clearCart();
@@ -166,9 +197,9 @@ export const CheckoutPage: React.FC = () => {
                     <Truck className={`w-5 h-5 ${deliveryMethod === 'standard' ? 'text-blue-600' : 'text-gray-400'}`} />
                     <span className={`font-bold ${deliveryMethod === 'standard' ? 'text-blue-900' : 'text-gray-700'}`}>Standard</span>
                   </div>
-                  <span className={`font-bold ${deliveryMethod === 'standard' ? 'text-blue-900' : 'text-gray-700'}`}>$4.99</span>
+                  <span className={`font-bold ${deliveryMethod === 'standard' ? 'text-blue-900' : 'text-gray-700'}`}>{formatCurrency(49)}</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">Delivery in 30-45 minutes. Delivered by courier to your door.</p>
+                <p className="text-sm text-gray-500 mt-2">Delivery in 1-2 days. Delivered by courier to your door.</p>
               </div>
 
               <div 
@@ -184,11 +215,11 @@ export const CheckoutPage: React.FC = () => {
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-2">
                     <Zap className={`w-5 h-5 ${deliveryMethod === 'drone' ? 'text-cyan-600' : 'text-gray-400'}`} />
-                    <span className={`font-bold ${deliveryMethod === 'drone' ? 'text-cyan-900' : 'text-gray-700'}`}>Drone Drop</span>
+                    <span className={`font-bold ${deliveryMethod === 'drone' ? 'text-cyan-900' : 'text-gray-700'}`}>Drone Priority</span>
                   </div>
-                  <span className={`font-bold ${deliveryMethod === 'drone' ? 'text-cyan-900' : 'text-gray-700'}`}>$9.99</span>
+                  <span className={`font-bold ${deliveryMethod === 'drone' ? 'text-cyan-900' : 'text-gray-700'}`}>{formatCurrency(99)}</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">Delivery in 10-15 minutes. Delivered by drone to your saved location.</p>
+                <p className="text-sm text-gray-500 mt-2">Priority fulfillment & delivery in 10-15 minutes by drone.</p>
               </div>
             </div>
           </section>
@@ -224,7 +255,7 @@ export const CheckoutPage: React.FC = () => {
                           <span className="text-[10px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded font-medium">Default</span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500 ml-8">{loc.address}</p>
+                      <p className="text-sm text-gray-500 ml-8">{loc.address || `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`}</p>
                     </div>
                   ))}
                 </div>
@@ -237,16 +268,28 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               )
             ) : (
-              <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
-                <div className="col-span-1 sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Address</label>
-                  <input type="text" defaultValue="123 Example Street" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" />
+              isLoadingLocations ? (
+                <div className="animate-pulse bg-gray-100 h-32 rounded-2xl"></div>
+              ) : addresses.length > 0 ? (
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                  {addresses.map(addr => (
+                    <AddressCard 
+                      key={addr.id} 
+                      address={addr} 
+                      selectable
+                      selected={selectedAddressId === addr.id}
+                      onSelect={(a) => setSelectedAddressId(a.id)}
+                    />
+                  ))}
                 </div>
-                <div className="col-span-1 sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">City</label>
-                  <input type="text" defaultValue="San Francisco" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" />
+              ) : (
+                <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-2xl">
+                  <p className="text-gray-500 mb-4">You don't have any saved addresses.</p>
+                  <Link to="/settings/addresses" className="text-blue-600 font-medium hover:underline">
+                    Add a delivery address
+                  </Link>
                 </div>
-              </div>
+              )
             )}
           </section>
 
@@ -254,16 +297,71 @@ export const CheckoutPage: React.FC = () => {
           <section className="bg-white border border-gray-100 p-6 md:p-8 rounded-3xl shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">4</span>
-              Payment
+              Payment Method
             </h2>
-            <div className="flex items-center gap-4 p-5 border-2 border-blue-600 bg-blue-50/30 rounded-2xl mb-4">
-              <div className="w-5 h-5 rounded-full border-[5px] border-blue-600"></div>
-              <div>
-                <p className="font-bold text-gray-900">Credit Card ending in 4242</p>
-                <p className="text-sm text-gray-500 mt-0.5">Exp: 12/28</p>
+            
+            <div className="space-y-4 mb-6">
+              <div 
+                className={`flex items-center gap-4 p-5 border-2 rounded-2xl cursor-pointer transition-all ${
+                  paymentMethod === 'UPI' ? 'border-blue-600 bg-blue-50/50' : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
+                onClick={() => setPaymentMethod('UPI')}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  paymentMethod === 'UPI' ? 'border-blue-600' : 'border-gray-300'
+                }`}>
+                  {paymentMethod === 'UPI' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">UPI - Google Pay / PhonePe</p>
+                  <p className="text-sm text-gray-500 mt-0.5">Instant secure transfer</p>
+                </div>
+              </div>
+
+              <div 
+                className={`flex items-center gap-4 p-5 border-2 rounded-2xl cursor-pointer transition-all ${
+                  paymentMethod === 'CARD' ? 'border-blue-600 bg-blue-50/50' : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
+                onClick={() => setPaymentMethod('CARD')}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  paymentMethod === 'CARD' ? 'border-blue-600' : 'border-gray-300'
+                }`}>
+                  {paymentMethod === 'CARD' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Credit / Debit Card</p>
+                  <p className="text-sm text-gray-500 mt-0.5">Visa, Mastercard, RuPay</p>
+                </div>
+              </div>
+
+              <div 
+                className={`flex items-center gap-4 p-5 border-2 rounded-2xl transition-all ${
+                  deliveryMethod === 'drone' 
+                    ? 'opacity-50 cursor-not-allowed border-gray-100 bg-gray-50' 
+                    : paymentMethod === 'COD' 
+                      ? 'border-blue-600 bg-blue-50/50 cursor-pointer' 
+                      : 'border-gray-200 hover:border-gray-300 bg-white cursor-pointer'
+                }`}
+                onClick={() => {
+                  if (deliveryMethod !== 'drone') setPaymentMethod('COD');
+                }}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  paymentMethod === 'COD' ? 'border-blue-600' : 'border-gray-300'
+                }`}>
+                  {paymentMethod === 'COD' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Cash on Delivery</p>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {deliveryMethod === 'drone' ? 'Not available for Drone Priority' : 'Pay when you receive the order'}
+                  </p>
+                </div>
               </div>
             </div>
-            <p className="text-xs text-gray-500 flex items-center gap-1.5 mt-4 justify-center md:justify-start">
+
+            <p className="text-xs text-gray-500 flex items-center gap-1.5 justify-center md:justify-start">
               <ShieldCheck className="w-4 h-4 text-green-500" /> Payments are secure and encrypted.
             </p>
           </section>
@@ -284,7 +382,7 @@ export const CheckoutPage: React.FC = () => {
                   <div className="flex-1">
                     <h4 className="text-sm font-bold text-gray-900 line-clamp-2">{item.product.name}</h4>
                     <p className="text-xs text-gray-500 mt-1">Qty: {item.quantity}</p>
-                    <p className="text-sm font-bold text-gray-900 mt-1">${(item.product.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-sm font-bold text-gray-900 mt-1">{formatCurrency(item.product.price * item.quantity)}</p>
                   </div>
                 </div>
               ))}
@@ -293,23 +391,29 @@ export const CheckoutPage: React.FC = () => {
             <div className="space-y-3 mb-6 pt-6 border-t border-gray-100">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span className="font-medium text-gray-900">${cartSubtotal.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">{formatCurrency(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Estimated Tax</span>
-                <span className="font-medium text-gray-900">${tax.toFixed(2)}</span>
+                <span>Estimated Tax (18%)</span>
+                <span className="font-medium text-gray-900">{formatCurrency(tax)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Delivery Fee</span>
-                <span className="font-medium text-gray-900">${deliveryFee.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">{formatCurrency(deliveryFee)}</span>
               </div>
+              {dronePriorityFee > 0 && (
+                <div className="flex justify-between text-cyan-700 bg-cyan-50 px-2 py-1 rounded-md -mx-2">
+                  <span className="flex items-center gap-1"><Zap size={14} /> Drone Priority</span>
+                  <span className="font-medium">{formatCurrency(dronePriorityFee)}</span>
+                </div>
+              )}
             </div>
 
             <div className="border-t border-gray-100 pt-6 mb-8">
               <div className="flex justify-between items-end">
                 <span className="font-bold text-gray-900 text-lg">Total</span>
                 <span className="text-3xl font-black text-gray-900">
-                  ${totalAmount.toFixed(2)}
+                  {formatCurrency(totalAmount)}
                 </span>
               </div>
             </div>

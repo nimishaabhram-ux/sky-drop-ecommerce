@@ -120,7 +120,7 @@ export const DroneSettingsPage: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <p className="text-gray-500 mb-3">{loc.address}</p>
+                <p className="text-gray-500 mb-3">{loc.address || `GPS: ${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`}</p>
                 <div className="flex items-center gap-2 text-sm font-bold text-green-600 mb-6 bg-green-50 w-max px-3 py-1.5 rounded-lg">
                   <ShieldCheck className="w-4 h-4" /> Verified Location
                 </div>

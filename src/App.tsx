@@ -17,6 +17,8 @@ import { AccountPage } from './pages/AccountPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { DroneSettingsPage } from './pages/DroneSettingsPage';
 import { DroneLocationSetupPage } from './pages/DroneLocationSetupPage';
+import { AddressesPage } from './pages/AddressesPage';
+import { PaymentsPage, NotificationsPage, SecurityPage } from './pages/MockSettingsPages';
 
 // Context Providers
 import { CartProvider } from './context/CartContext';
@@ -39,6 +41,10 @@ export default function App() {
               <Route path="/orders/:id/track" element={<OrderTrackingPage />} />
               <Route path="/account" element={<AccountPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings/addresses" element={<AddressesPage />} />
+              <Route path="/settings/payments" element={<PaymentsPage />} />
+              <Route path="/settings/notifications" element={<NotificationsPage />} />
+              <Route path="/settings/security" element={<SecurityPage />} />
               <Route path="/settings/drone" element={<DroneSettingsPage />} />
               <Route path="/settings/drone/location/new" element={<DroneLocationSetupPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />

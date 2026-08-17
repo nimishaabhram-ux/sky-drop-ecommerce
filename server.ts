@@ -13,11 +13,11 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 let users = [
   {
     id: 'user-001',
-    name: 'Alex Rivera',
-    email: 'alex.rivera@skyflow.io',
-    phone: '+1 (555) 234-5678',
+    name: 'Arjun Nair',
+    email: 'arjun.nair@example.com',
+    phone: '+91 98765 43210',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    address: '742 Evergreen Terrace, Sector 4, Silicon Hills',
+    address: 'Flat 4B, Green View Apartments, Kakkanad, Kochi, Kerala',
     preferredUnits: 'metric',
     notificationsEnabled: true,
     flightAlertsEnabled: true,
@@ -34,6 +34,7 @@ let locations = [
     longitude: -122.4194,
     gpsAccuracy: 1.4,
     altitude: 48,
+    address: '12 Greenfield Lane, Kakkanad, Kochi, Kerala',
     status: 'verified',
     isDefault: true,
     clearanceScore: 98,
@@ -53,6 +54,7 @@ let locations = [
     longitude: -122.4167,
     gpsAccuracy: 2.1,
     altitude: 92,
+    address: 'Rooftop B, SmartCity Tech Hub, Kakkanad, Kochi',
     status: 'verified',
     isDefault: false,
     clearanceScore: 94,
@@ -67,6 +69,9 @@ let locations = [
 
 let locationImagesStore: Record<string, any[]> = {};
 
+let addresses: any[] = [];
+let reviews: any[] = [];
+
 let orders: any[] = [
   {
     id: 'ORD-84920',
@@ -76,7 +81,7 @@ let orders: any[] = [
         product: {
           id: 'prod-01',
           name: 'Rapid Emergency First-Aid Kit',
-          price: 44.99,
+          price: 899,
           imageUrl: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=500&auto=format&fit=crop&q=80',
           weightGrams: 580,
         },
@@ -86,7 +91,7 @@ let orders: any[] = [
         product: {
           id: 'prod-02',
           name: 'Artisan Espresso & Warm Croissant Set',
-          price: 14.50,
+          price: 349,
           imageUrl: 'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=500&auto=format&fit=crop&q=80',
           weightGrams: 360,
         },
@@ -97,11 +102,11 @@ let orders: any[] = [
     deliveryLocationId: 'loc-001',
     deliveryLocation: locations[0],
     totalWeightGrams: 940,
-    subtotal: 59.49,
+    subtotal: 1248,
     deliveryFee: 0.0,
-    dronePriorityFee: 3.99,
-    tax: 4.76,
-    totalAmount: 68.24,
+    dronePriorityFee: 99,
+    tax: 224,
+    totalAmount: 1571,
     status: 'DRONE_FLYING',
     estimatedDeliveryMinutes: 4,
     createdAt: new Date(Date.now() - 7 * 60 * 1000).toISOString(),
@@ -109,7 +114,7 @@ let orders: any[] = [
     trackingNumber: 'SKY-FLX-9938',
     droneId: 'FALCON-X9',
     deliveryNotes: 'Autonomous precision tether descent to backyard grass landing zone.',
-    paymentMethod: 'apple_pay',
+    paymentMethod: 'UPI',
   },
 ];
 
@@ -260,6 +265,93 @@ app.post('/api/delivery-locations/:id/process', (req, res) => {
   res.json({ success: true, result: photogrammetryResult });
 });
 
+// Standard Delivery Addresses
+app.get('/api/delivery-addresses', (req, res) => {
+  res.json({ addresses });
+});
+
+app.get('/api/delivery-addresses/:id', (req, res) => {
+  const address = addresses.find((a) => a.id === req.params.id);
+  if (!address) return res.status(404).json({ error: 'Address not found' });
+  res.json({ address });
+});
+
+app.post('/api/delivery-addresses', (req, res) => {
+  const newAddress = {
+    id: `addr-${Date.now()}`,
+    userId: 'user-001',
+    isDefault: addresses.length === 0,
+    country: 'India',
+    ...req.body,
+  };
+  
+  if (newAddress.isDefault) {
+    addresses.forEach(a => a.isDefault = false);
+  }
+  
+  addresses.push(newAddress);
+  res.json({ success: true, address: newAddress });
+});
+
+app.put('/api/delivery-addresses/:id', (req, res) => {
+  const idx = addresses.findIndex((a) => a.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Address not found' });
+  
+  const updatedAddress = { ...addresses[idx], ...req.body };
+  if (req.body.isDefault) {
+    addresses.forEach(a => a.isDefault = false);
+    updatedAddress.isDefault = true;
+  }
+  
+  addresses[idx] = updatedAddress;
+  res.json({ success: true, address: updatedAddress });
+});
+
+app.delete('/api/delivery-addresses/:id', (req, res) => {
+  const idx = addresses.findIndex((a) => a.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Address not found' });
+  
+  const wasDefault = addresses[idx].isDefault;
+  addresses = addresses.filter((a) => a.id !== req.params.id);
+  
+  if (wasDefault && addresses.length > 0) {
+    addresses[0].isDefault = true;
+  }
+  
+  res.json({ success: true });
+});
+
+app.post('/api/delivery-addresses/:id/set-default', (req, res) => {
+  addresses = addresses.map((a) => ({
+    ...a,
+    isDefault: a.id === req.params.id,
+  }));
+  res.json({ success: true, addresses });
+});
+
+// Product Reviews
+app.get('/api/products/:productId/reviews', (req, res) => {
+  const productReviews = reviews.filter(r => r.productId === req.params.productId);
+  res.json({ reviews: productReviews });
+});
+
+app.post('/api/products/:productId/reviews', (req, res) => {
+  const newReview = {
+    id: `rev-${Date.now()}`,
+    productId: req.params.productId,
+    userId: 'user-001',
+    userName: req.body.userName || users[0].name,
+    userAvatarUrl: req.body.userAvatarUrl || users[0].avatarUrl,
+    rating: req.body.rating,
+    description: req.body.description,
+    images: req.body.images || [],
+    createdAt: new Date().toISOString(),
+    verifiedPurchase: req.body.verifiedPurchase || false,
+  };
+  reviews.unshift(newReview);
+  res.json({ success: true, review: newReview });
+});
+
 // Orders
 app.get('/api/orders', (req, res) => {
   res.json({ orders });
@@ -272,30 +364,33 @@ app.get('/api/orders/:id', (req, res) => {
 });
 
 app.post('/api/orders', (req, res) => {
-  const { items, deliveryMethod, deliveryLocationId, totalAmount, totalWeightGrams, paymentMethod } = req.body;
-  const targetLocation = locations.find((l) => l.id === deliveryLocationId) || locations[0];
+  const { items, deliveryMethod, deliveryLocationId, deliveryAddressId, totalAmount, totalWeightGrams, paymentMethod, subtotal } = req.body;
+  const targetDroneLocation = locations.find((l) => l.id === deliveryLocationId);
+  const targetStandardAddress = addresses.find((a) => a.id === deliveryAddressId);
 
   const newOrder = {
     id: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
     userId: 'user-001',
     items,
     deliveryMethod: deliveryMethod || 'drone',
-    deliveryLocationId: targetLocation?.id,
-    deliveryLocation: targetLocation,
+    deliveryLocationId: targetDroneLocation?.id,
+    deliveryLocation: targetDroneLocation,
+    deliveryAddressId: targetStandardAddress?.id,
+    deliveryAddress: targetStandardAddress,
     totalWeightGrams: totalWeightGrams || 750,
-    subtotal: req.body.subtotal || 45.0,
-    deliveryFee: 0.0,
-    dronePriorityFee: 3.99,
-    tax: 3.5,
-    totalAmount: totalAmount || 52.49,
+    subtotal: subtotal || 0,
+    deliveryFee: deliveryMethod === 'standard' ? 49 : 0,
+    dronePriorityFee: deliveryMethod === 'drone' ? 99 : 0,
+    tax: Math.round((subtotal || 0) * 0.18),
+    totalAmount: totalAmount || 0,
     status: 'ORDER_PROCESSING',
-    estimatedDeliveryMinutes: 8,
+    estimatedDeliveryMinutes: deliveryMethod === 'drone' ? 8 : 1440,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     trackingNumber: `SKY-FLX-${Math.floor(1000 + Math.random() * 9000)}`,
-    droneId: 'FALCON-X9',
-    deliveryNotes: req.body.deliveryNotes || 'Autonomous landing at registered GPS waypoint.',
-    paymentMethod: paymentMethod || 'apple_pay',
+    droneId: deliveryMethod === 'drone' ? 'FALCON-X9' : undefined,
+    deliveryNotes: req.body.deliveryNotes || '',
+    paymentMethod: paymentMethod || 'UPI',
   };
 
   orders.unshift(newOrder);

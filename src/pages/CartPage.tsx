@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, ShoppingBag, Minus, Plus, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Button } from '../components/common/Button';
+import { formatCurrency } from '../utils/currency';
 
 export const CartPage: React.FC = () => {
   const { cart, updateQuantity, removeFromCart, cartSubtotal } = useCart();
@@ -59,11 +60,11 @@ export const CartPage: React.FC = () => {
                       </div>
                       <div className="text-right shrink-0">
                         <span className="font-bold text-gray-900 text-lg block">
-                          ${(item.product.price * item.quantity).toFixed(2)}
+                          {formatCurrency(item.product.price * item.quantity)}
                         </span>
                         {item.product.originalPrice && (
                           <span className="text-sm text-gray-400 line-through">
-                            ${(item.product.originalPrice * item.quantity).toFixed(2)}
+                            {formatCurrency(item.product.originalPrice * item.quantity)}
                           </span>
                         )}
                       </div>
@@ -112,11 +113,11 @@ export const CartPage: React.FC = () => {
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span className="font-medium text-gray-900">${cartSubtotal.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">{formatCurrency(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Estimated Tax</span>
-                <span className="font-medium text-gray-900">${(cartSubtotal * 0.08).toFixed(2)}</span>
+                <span>Estimated Tax (18%)</span>
+                <span className="font-medium text-gray-900">{formatCurrency(Math.round(cartSubtotal * 0.18))}</span>
               </div>
               <div className="flex justify-between text-gray-500 text-sm">
                 <span>Delivery Fee</span>
@@ -129,7 +130,7 @@ export const CartPage: React.FC = () => {
                 <span className="font-bold text-gray-900 text-lg">Total</span>
                 <div className="text-right">
                   <span className="text-2xl font-black text-gray-900 block leading-none">
-                    ${(cartSubtotal * 1.08).toFixed(2)}
+                    {formatCurrency(cartSubtotal + Math.round(cartSubtotal * 0.18))}
                   </span>
                   <p className="text-xs text-gray-500 mt-1">Excluding delivery</p>
                 </div>
