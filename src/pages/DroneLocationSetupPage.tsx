@@ -275,7 +275,7 @@ export const DroneLocationSetupPage: React.FC = () => {
 
       {/* Camera Full Screen Modal */}
       {isCameraActive && (
-        <div className="fixed inset-0 z-50 bg-black flex flex-col">
+        <div className="fixed inset-0 z-[60] bg-black flex flex-col">
           <div className="p-4 flex justify-between items-center text-white bg-gradient-to-b from-black/50 to-transparent absolute top-0 left-0 right-0 z-10">
             <button onClick={() => setIsCameraActive(false)} className="p-2">
               <X className="w-6 h-6" />
@@ -299,7 +299,7 @@ export const DroneLocationSetupPage: React.FC = () => {
             />
           </div>
 
-          <div className="p-8 bg-black flex flex-col items-center">
+          <div className="pt-6 px-8 pb-[calc(2rem+env(safe-area-inset-bottom,1rem))] bg-black flex flex-col items-center">
             <p className="text-white text-[15px] mb-8 text-center">Capture the delivery point.</p>
             <button 
               onClick={handleCapture}
