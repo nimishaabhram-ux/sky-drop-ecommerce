@@ -131,7 +131,7 @@ export const OrderTrackingPage: React.FC = () => {
 
           {telemetry && (
             <Marker position={[telemetry.latitude, telemetry.longitude]} icon={droneIcon}>
-              <Popup>SkyDrop Drone</Popup>
+              <Popup>Abay Drone</Popup>
             </Marker>
           )}
 

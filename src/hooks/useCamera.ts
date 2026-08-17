@@ -31,10 +31,6 @@ export const useCamera = () => {
         audio: false
       });
       setState({ stream, error: null, isStarting: false });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(e => console.error("Error playing video:", e));
-      }
     } catch (err: any) {
       let errorMsg = 'Failed to access camera.';
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
@@ -54,6 +50,16 @@ export const useCamera = () => {
       }
     };
   }, [state.stream]);
+
+  // Bind stream to video element
+  useEffect(() => {
+    if (state.stream && videoRef.current) {
+      if (videoRef.current.srcObject !== state.stream) {
+        videoRef.current.srcObject = state.stream;
+        videoRef.current.play().catch(e => console.error("Error playing video:", e));
+      }
+    }
+  });
 
   const capturePhoto = useCallback((): string | null => {
     if (!videoRef.current || !state.stream) return null;

@@ -23,7 +23,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
 }) => {
   return (
     <div 
-      className={`bg-white border rounded-2xl p-5 transition-all relative ${
+      className={`bg-white border rounded-xl p-5 transition-all relative ${
         selectable && onSelect ? 'cursor-pointer hover:border-blue-300' : ''
       } ${
         selected ? 'border-blue-600 ring-1 ring-blue-600 bg-blue-50/20' : 'border-gray-200'
@@ -37,9 +37,9 @@ export const AddressCard: React.FC<AddressCardProps> = ({
           <div className={`p-1.5 rounded-md ${selected ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
             <MapPin className="w-4 h-4" />
           </div>
-          <span className="font-bold text-gray-900">{address.label}</span>
+          <span className="font-semibold text-gray-900">{address.label}</span>
           {address.isDefault && (
-            <span className="text-[10px] font-bold tracking-wider uppercase bg-gray-900 text-white px-2 py-0.5 rounded">
+            <span className="text-[10px] font-medium tracking-wider uppercase bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
               Default
             </span>
           )}

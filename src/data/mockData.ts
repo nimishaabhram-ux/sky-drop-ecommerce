@@ -2,9 +2,9 @@ import { DeliveryLocation, FlightWeather, Order, Product, User } from '../types'
 
 export const INITIAL_USER: User = {
   id: 'user-001',
-  name: 'Arjun Nair',
-  email: 'arjun.nair@example.com',
-  phone: '+91 98765 43210',
+  name: 'Ajith Santhosh',
+  email: 'ajith.abhram@gmail.com',
+  phone: '+91 9656239528',
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   address: 'Flat 4B, Green View Apartments, Kakkanad, Kochi, Kerala',
   preferredUnits: 'metric',

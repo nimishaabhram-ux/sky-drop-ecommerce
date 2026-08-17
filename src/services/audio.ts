@@ -1,4 +1,4 @@
-// Web Audio API Sound Synthesizer for SkyDrop
+// Web Audio API Sound Synthesizer for Abay
 class SoundFX {
   private ctx: AudioContext | null = null;
 

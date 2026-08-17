@@ -40,7 +40,7 @@ export default function App() {
               <Route path="/orders/:id" element={<OrderDetailsPage />} />
               <Route path="/orders/:id/track" element={<OrderTrackingPage />} />
               <Route path="/account" element={<AccountPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings/profile" element={<SettingsPage />} />
               <Route path="/settings/addresses" element={<AddressesPage />} />
               <Route path="/settings/payments" element={<PaymentsPage />} />
               <Route path="/settings/notifications" element={<NotificationsPage />} />

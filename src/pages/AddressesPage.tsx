@@ -5,6 +5,7 @@ import { addressesApi } from '../services/addressesApi';
 import { DeliveryAddress } from '../types';
 import { AddressCard } from '../components/addresses/AddressCard';
 import { AddressForm } from '../components/addresses/AddressForm';
+import { Button } from '../components/common/Button';
 
 export const AddressesPage: React.FC = () => {
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
@@ -77,27 +78,23 @@ export const AddressesPage: React.FC = () => {
 
   return (
     <div className="max-w-[1000px] mx-auto px-4 md:px-8 py-6 md:py-10">
-      <div className="flex items-center text-sm text-gray-500 mb-6">
-        <Link to="/account" className="hover:text-gray-900">Account</Link>
-        <ChevronRight className="w-4 h-4 mx-1" />
-        <span className="text-gray-900 font-medium">Saved Addresses</span>
-      </div>
-
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Saved Addresses</h1>
-          <p className="text-gray-600">Manage your standard delivery addresses</p>
+      <div className="mb-8">
+        <button onClick={() => window.history.back()} className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 mb-4 transition-colors">
+          <ChevronRight className="w-4 h-4 mr-1 rotate-180" />
+          Back to Account
+        </button>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl md:text-[28px] font-semibold text-gray-900 mb-1">Delivery addresses</h1>
+            <p className="text-[15px] text-gray-500">Manage your standard delivery addresses.</p>
+          </div>
+          
+          {!isAdding && !editingAddress && (
+            <Button onClick={() => setIsAdding(true)} className="hidden sm:flex items-center">
+              Add address
+            </Button>
+          )}
         </div>
-        
-        {!isAdding && !editingAddress && (
-          <button 
-            onClick={() => setIsAdding(true)}
-            className="flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Add New Address
-          </button>
-        )}
       </div>
 
       {isAdding && (
@@ -141,20 +138,25 @@ export const AddressesPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 px-4 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
-              <MapPin className="w-8 h-8 text-gray-300" />
+          <div className="text-center py-16 px-4 md:bg-white md:border md:border-gray-200 md:rounded-xl md:shadow-sm">
+            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
+              <MapPin className="w-5 h-5 text-gray-400" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No addresses saved</h3>
-            <p className="text-gray-500 mb-6">Add an address for faster checkout on standard deliveries.</p>
-            <button 
-              onClick={() => setIsAdding(true)}
-              className="bg-white border border-gray-200 text-gray-900 font-bold px-6 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              Add your first address
-            </button>
+            <h3 className="text-[16px] font-medium text-gray-900 mb-1">No addresses saved</h3>
+            <p className="text-[14px] text-gray-500 mb-6">Add an address for faster checkout on standard deliveries.</p>
+            <Button onClick={() => setIsAdding(true)}>
+              Add delivery address
+            </Button>
           </div>
         )
+      )}
+
+      {!isAdding && !editingAddress && (
+        <div className="mt-6 sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10">
+          <Button fullWidth onClick={() => setIsAdding(true)} className="shadow-none">
+            Add address
+          </Button>
+        </div>
       )}
     </div>
   );

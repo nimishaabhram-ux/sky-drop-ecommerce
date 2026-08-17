@@ -1,6 +1,6 @@
 {
-  "name": "SkyDrop Drone Delivery",
-  "short_name": "SkyDrop",
+  "name": "Abay Drone Delivery",
+  "short_name": "Abay",
   "description": "High-precision autonomous drone delivery and landing zone photogrammetry scanner",
   "start_url": "/",
   "display": "standalone",

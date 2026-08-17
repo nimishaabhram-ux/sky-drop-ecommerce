@@ -13,9 +13,9 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 let users = [
   {
     id: 'user-001',
-    name: 'Arjun Nair',
-    email: 'arjun.nair@example.com',
-    phone: '+91 98765 43210',
+    name: 'Ajith Santhosh',
+    email: 'ajith.abhram@gmail.com',
+    phone: '+91 9656239528',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     address: 'Flat 4B, Green View Apartments, Kakkanad, Kochi, Kerala',
     preferredUnits: 'metric',
@@ -200,7 +200,7 @@ app.get('/api/auth/me', (req, res) => {
 app.post('/api/auth/login', (req, res) => {
   const { email } = req.body;
   let user = users.find((u) => u.email === email) || users[0];
-  res.json({ success: true, user, token: 'mock-jwt-skydrop-token' });
+  res.json({ success: true, user, token: 'mock-jwt-abay-token' });
 });
 
 // Delivery Locations
@@ -470,7 +470,7 @@ app.get('/api/orders/:id/tracking', (req, res) => {
     telemetry: {
       orderId: order.id,
       droneId: order.droneId || 'FALCON-X9',
-      droneModel: 'SkyDrop Aero-Hexa V4 Pro',
+      droneModel: 'Abay Aero-Hexa V4 Pro',
       latitude: loc.latitude + 0.006,
       longitude: loc.longitude - 0.008,
       altitude: 114,
@@ -525,7 +525,7 @@ app.get('/api/drone-telemetry/:orderId/stream', (req, res) => {
     const telemetryData = {
       orderId,
       droneId: order.droneId || 'FALCON-X9',
-      droneModel: 'SkyDrop Aero-Hexa V4 Pro',
+      droneModel: 'Abay Aero-Hexa V4 Pro',
       latitude: currentLat,
       longitude: currentLng,
       altitude: currentStatus === 'DELIVERY_IN_PROGRESS' ? 5 : currentStatus === 'DELIVERED' ? 0 : 120 - progress * 20,
@@ -572,7 +572,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`SkyDrop Flight Logistics Server running on port ${PORT}`);
+    console.log(`Abay Flight Logistics Server running on port ${PORT}`);
   });
 }
 

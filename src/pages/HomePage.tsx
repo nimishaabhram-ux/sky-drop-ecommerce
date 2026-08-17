@@ -95,7 +95,7 @@ export const HomePage: React.FC = () => {
               <Zap className="w-6 h-6" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Get it faster with SkyDrop Drone
+              Get it faster with Abay Drone
             </h2>
             <p className="text-gray-600 text-lg mb-6 max-w-xl">
               Eligible products can be delivered directly to your saved drone delivery location in 10-15 minutes.

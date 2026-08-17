@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DeliveryAddress } from '../../types';
+import { Button } from '../common/Button';
 
 interface AddressFormProps {
   initialData?: Partial<DeliveryAddress>;
@@ -44,14 +45,14 @@ export const AddressForm: React.FC<AddressFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+      <h3 className="text-xl font-semibold text-gray-900 mb-6">
         {initialData?.id ? 'Edit Address' : 'Add New Address'}
       </h3>
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
         <div className="col-span-1 sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Save as</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">Save as</label>
           <div className="flex gap-4">
             {['Home', 'Work', 'Other'].map(type => (
               <label key={type} className="flex items-center gap-2 cursor-pointer">
@@ -70,19 +71,19 @@ export const AddressForm: React.FC<AddressFormProps> = ({
         </div>
 
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Recipient Name *</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">Recipient Name *</label>
           <input 
             type="text" 
             name="recipientName" 
             value={formData.recipientName || ''} 
             onChange={handleChange}
             required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
           />
         </div>
 
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone Number *</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">Phone Number *</label>
           <input 
             type="tel" 
             name="phone" 
@@ -90,12 +91,12 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             onChange={handleChange}
             required
             placeholder="+91"
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
           />
         </div>
 
         <div className="col-span-1 sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Address Line 1 *</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">Address Line 1 *</label>
           <input 
             type="text" 
             name="addressLine1" 
@@ -103,36 +104,36 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             onChange={handleChange}
             required
             placeholder="Flat, House no., Building, Company, Apartment"
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
           />
         </div>
 
         <div className="col-span-1 sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Address Line 2</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">Address Line 2</label>
           <input 
             type="text" 
             name="addressLine2" 
             value={formData.addressLine2 || ''} 
             onChange={handleChange}
             placeholder="Area, Street, Sector, Village"
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
           />
         </div>
 
         <div className="col-span-1 sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Landmark</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">Landmark</label>
           <input 
             type="text" 
             name="landmark" 
             value={formData.landmark || ''} 
             onChange={handleChange}
             placeholder="E.g. near Apollo Hospital"
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
           />
         </div>
 
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">PIN Code *</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">PIN Code *</label>
           <input 
             type="text" 
             name="postalCode" 
@@ -140,30 +141,30 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             onChange={handleChange}
             required
             maxLength={6}
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
           />
         </div>
 
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">City *</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">City *</label>
           <input 
             type="text" 
             name="city" 
             value={formData.city || ''} 
             onChange={handleChange}
             required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
           />
         </div>
 
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">State *</label>
+          <label className="block text-[14px] font-medium text-gray-700 mb-1.5">State *</label>
           <select 
             name="state" 
             value={formData.state || ''} 
             onChange={handleChange}
             required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
           >
             <option value="">Select State</option>
             <option value="Kerala">Kerala</option>
@@ -188,22 +189,23 @@ export const AddressForm: React.FC<AddressFormProps> = ({
         </div>
       </div>
 
-      <div className="flex gap-4 mt-8 pt-6 border-t border-gray-100">
-        <button 
+      <div className="flex flex-col sm:flex-row gap-3 mt-8 pt-6 border-t border-gray-100">
+        <Button 
           type="submit" 
           disabled={isSubmitting}
-          className="flex-1 bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="w-full sm:w-auto"
         >
           {isSubmitting ? 'Saving...' : 'Save Address'}
-        </button>
-        <button 
+        </Button>
+        <Button 
+          variant="secondary"
           type="button" 
           onClick={onCancel}
           disabled={isSubmitting}
-          className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
+          className="w-full sm:w-auto"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

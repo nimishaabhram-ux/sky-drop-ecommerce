@@ -1,125 +1,118 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, Package, Settings, MapPin, Bell, LogOut, ChevronRight, CreditCard, Shield } from 'lucide-react';
+import { User, Package, MapPin, Bell, LogOut, ChevronRight, CreditCard, Shield, Navigation } from 'lucide-react';
 
 export const AccountPage: React.FC = () => {
   return (
-    <div className="max-w-[800px] mx-auto px-4 md:px-8 py-6 md:py-8 min-h-screen">
-      <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-8">Account</h1>
+    <div className="max-w-[900px] mx-auto px-4 md:px-8 py-6 md:py-10 min-h-screen bg-white md:bg-transparent">
+      <h1 className="text-2xl md:text-[28px] font-semibold text-gray-900 mb-8 px-2 md:px-0">Account</h1>
 
       {/* Profile Summary */}
-      <div className="flex items-center gap-5 mb-10 bg-white border border-gray-100 p-6 rounded-3xl shadow-sm">
-        <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-[2rem] flex items-center justify-center text-3xl font-black shadow-inner">
+      <Link to="/settings/profile" className="flex items-center gap-4 mb-8 md:mb-10 p-4 md:px-6 hover:bg-slate-50 transition-colors rounded-xl group">
+        <div className="w-14 h-14 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center text-xl font-semibold shrink-0">
           A
         </div>
-        <div>
-          <h2 className="text-2xl font-black text-gray-900">Alex Smith</h2>
-          <p className="text-gray-500 font-medium">alex.smith@example.com</p>
-          <p className="text-gray-500 text-sm mt-1 font-bold">+1 (555) 123-4567</p>
+        <div className="flex-1">
+          <h2 className="text-lg font-semibold text-gray-900 leading-tight">Ajith Santhosh</h2>
+          <p className="text-sm text-gray-600 leading-tight mt-0.5">ajith.abhram@gmail.com</p>
+          <p className="text-sm text-gray-600 leading-tight mt-0.5">+91 9656239528</p>
         </div>
-      </div>
+        <span className="hidden sm:block text-sm font-medium text-blue-600 group-hover:text-blue-700 px-2 py-1">
+          Edit profile
+        </span>
+        <ChevronRight className="sm:hidden w-5 h-5 text-gray-400 group-hover:text-gray-600 shrink-0" />
+      </Link>
 
-      <div className="space-y-4">
-        {/* Navigation Links */}
-        <Link to="/orders" className="block">
-          <div className="bg-white border border-gray-100 hover:border-blue-200 transition-colors flex items-center p-5 rounded-3xl shadow-sm group">
-            <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-600 mr-5 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-              <Package className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 text-lg">My Orders</h3>
-              <p className="text-sm text-gray-500 font-medium">View your order history and track deliveries</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
-          </div>
-        </Link>
-
-        <Link to="/settings/drone" className="block">
-          <div className="bg-white border border-gray-100 hover:border-cyan-200 transition-colors flex items-center p-5 rounded-3xl shadow-sm group">
-            <div className="w-12 h-12 bg-cyan-50 rounded-2xl flex items-center justify-center text-cyan-600 mr-5 group-hover:bg-cyan-100 transition-colors">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 text-lg">Drone Delivery Locations</h3>
-              <p className="text-sm text-gray-500 font-medium">Manage your verified drone landing zones</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 transition-colors" />
-          </div>
-        </Link>
-
-        <Link to="/settings/addresses" className="block">
-          <div className="bg-white border border-gray-100 hover:border-blue-200 transition-colors flex items-center p-5 rounded-3xl shadow-sm group">
-            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mr-5 group-hover:bg-blue-100 transition-colors">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 text-lg">Standard Delivery Addresses</h3>
-              <p className="text-sm text-gray-500 font-medium">Manage your saved addresses for standard delivery</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
-          </div>
-        </Link>
-
-        <Link to="/settings/payments" className="block">
-          <div className="bg-white border border-gray-100 hover:border-blue-200 transition-colors flex items-center p-5 rounded-3xl shadow-sm group">
-            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mr-5 group-hover:bg-blue-100 transition-colors">
-              <CreditCard className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 text-lg">Payment Methods</h3>
-              <p className="text-sm text-gray-500 font-medium">Manage your saved credit cards and UPI options</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
-          </div>
-        </Link>
-
-        <Link to="/settings/notifications" className="block">
-          <div className="bg-white border border-gray-100 hover:border-purple-200 transition-colors flex items-center p-5 rounded-3xl shadow-sm group">
-            <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mr-5 group-hover:bg-purple-100 transition-colors">
-              <Bell className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 text-lg">Notifications</h3>
-              <p className="text-sm text-gray-500 font-medium">Manage order updates and promotional alerts</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
-          </div>
-        </Link>
-
-        <Link to="/settings/security" className="block">
-          <div className="bg-white border border-gray-100 hover:border-green-200 transition-colors flex items-center p-5 rounded-3xl shadow-sm group">
-            <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mr-5 group-hover:bg-green-100 transition-colors">
-              <Shield className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 text-lg">Security & Privacy</h3>
-              <p className="text-sm text-gray-500 font-medium">Password, two-factor authentication, and data</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-600 transition-colors" />
-          </div>
-        </Link>
-
-        <Link to="/settings" className="block">
-          <div className="bg-white border border-gray-100 hover:border-gray-300 transition-colors flex items-center p-5 rounded-3xl shadow-sm group">
-            <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-600 mr-5 group-hover:bg-gray-100 transition-colors">
-              <Settings className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 text-lg">Profile Settings</h3>
-              <p className="text-sm text-gray-500 font-medium">Update your personal information</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-          </div>
-        </Link>
+      <div className="space-y-8 overflow-hidden">
         
-        <div className="bg-white border border-gray-100 hover:border-red-200 transition-colors flex items-center p-5 rounded-3xl shadow-sm cursor-pointer mt-8 group">
-          <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 mr-5 group-hover:bg-red-100 transition-colors">
-            <LogOut className="w-6 h-6" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-red-600 text-lg">Log out</h3>
+        {/* Orders & delivery */}
+        <div>
+          <h3 className="text-[17px] font-semibold text-gray-900 mb-2 px-2 md:px-6 md:pt-6">Orders & delivery</h3>
+          <div className="md:px-2">
+            <Link to="/orders" className="flex items-center p-4 hover:bg-slate-50 transition-colors group border-b border-gray-100">
+              <Package className="w-5 h-5 text-slate-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-gray-900 leading-tight">My orders</h4>
+                <p className="text-[13px] text-gray-500 mt-0.5">View and track your orders</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            </Link>
+            
+            <Link to="/settings/addresses" className="flex items-center p-4 hover:bg-slate-50 transition-colors group border-b border-gray-100">
+              <MapPin className="w-5 h-5 text-slate-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-gray-900 leading-tight">Delivery addresses</h4>
+                <p className="text-[13px] text-gray-500 mt-0.5">Manage standard delivery addresses</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            </Link>
+
+            <Link to="/settings/drone" className="flex items-center p-4 hover:bg-slate-50 transition-colors group border-b border-gray-100">
+              <Navigation className="w-5 h-5 text-slate-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-gray-900 leading-tight">Drone delivery</h4>
+                <p className="text-[13px] text-gray-500 mt-0.5">Manage locations for drone delivery</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            </Link>
           </div>
         </div>
+
+        {/* Payments & preferences */}
+        <div>
+          <h3 className="text-[17px] font-semibold text-gray-900 mb-2 px-2 md:px-6">Payments & preferences</h3>
+          <div className="md:px-2">
+            <Link to="/settings/payments" className="flex items-center p-4 hover:bg-slate-50 transition-colors group border-b border-gray-100">
+              <CreditCard className="w-5 h-5 text-slate-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-gray-900 leading-tight">Payment methods</h4>
+                <p className="text-[13px] text-gray-500 mt-0.5">Manage saved cards and UPI</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            </Link>
+
+            <Link to="/settings/notifications" className="flex items-center p-4 hover:bg-slate-50 transition-colors group border-b border-gray-100">
+              <Bell className="w-5 h-5 text-slate-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-gray-900 leading-tight">Notifications</h4>
+                <p className="text-[13px] text-gray-500 mt-0.5">Order updates and alerts</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Account */}
+        <div>
+          <h3 className="text-[17px] font-semibold text-gray-900 mb-2 px-2 md:px-6">Account</h3>
+          <div className="md:px-2">
+            <Link to="/settings/profile" className="flex items-center p-4 hover:bg-slate-50 transition-colors group border-b border-gray-100">
+              <User className="w-5 h-5 text-slate-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-gray-900 leading-tight">Profile</h4>
+                <p className="text-[13px] text-gray-500 mt-0.5">Personal information</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            </Link>
+
+            <Link to="/settings/security" className="flex items-center p-4 hover:bg-slate-50 transition-colors group border-b border-gray-100">
+              <Shield className="w-5 h-5 text-slate-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-gray-900 leading-tight">Security & privacy</h4>
+                <p className="text-[13px] text-gray-500 mt-0.5">Password and data</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+            </Link>
+            
+            <button className="w-full flex items-center p-4 hover:bg-slate-50 transition-colors group md:pb-6 text-left">
+              <LogOut className="w-5 h-5 text-red-500 mr-4" />
+              <div className="flex-1">
+                <h4 className="text-[15px] font-medium text-red-600 leading-tight">Sign out</h4>
+              </div>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );

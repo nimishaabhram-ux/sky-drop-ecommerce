@@ -16,7 +16,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
-      const saved = localStorage.getItem('skydrop_cart');
+      const saved = localStorage.getItem('abay_cart');
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
       return [];
@@ -24,7 +24,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    localStorage.setItem('skydrop_cart', JSON.stringify(cart));
+    localStorage.setItem('abay_cart', JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = (product: Product, quantity: number = 1) => {

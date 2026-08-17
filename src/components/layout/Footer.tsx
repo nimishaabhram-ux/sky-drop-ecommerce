@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Package className="w-8 h-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900 tracking-tight">SkyDrop</span>
+              <span className="text-2xl font-bold text-gray-900 tracking-tight">Abay</span>
             </Link>
             <p className="text-gray-500 text-sm mb-6">
               Get everyday essentials delivered faster. Standard or drone delivery straight to your location.
@@ -32,7 +32,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-slate-200 text-sm text-slate-500 flex flex-col sm:flex-row justify-between items-center">
-          <p>&copy; {new Date().getFullYear()} SkyDrop Delivery. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Abay Delivery. All rights reserved.</p>
           <div className="flex gap-4 mt-4 sm:mt-0">
             <a href="#" className="hover:text-slate-900">Privacy</a>
             <a href="#" className="hover:text-slate-900">Terms</a>

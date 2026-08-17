@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span className="text-xl sm:text-2xl font-black tracking-tighter text-white font-display-bold">
-                SKYDROP<span className="text-neutral-500">.</span>
+                ABAY<span className="text-neutral-500">.</span>
               </span>
               <span className="hidden xs:inline-flex items-center gap-1 px-1.5 py-0.5 border border-white/20 text-[9px] font-mono-tech tracking-widest text-neutral-300 uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
