@@ -367,7 +367,7 @@ export const DroneLocationSetupPage: React.FC = () => {
               )}
             </div>
 
-            <div className="mt-auto pt-6 border-t border-gray-100 mt-8 flex flex-col md:flex-row justify-end">
+            <div className="mt-auto md:mt-8 pt-4 md:pt-6 border-t border-gray-100 flex flex-col md:flex-row justify-end sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 bg-white md:bg-transparent pb-4 md:pb-0 z-10">
               <Button className="w-full md:w-auto" onClick={handleLocationContinue} disabled={!location}>
                 Continue
               </Button>
@@ -423,7 +423,7 @@ export const DroneLocationSetupPage: React.FC = () => {
               ))}
             </div>
 
-            <div className="mt-auto pt-6 border-t border-gray-100 mt-8 flex gap-3 flex-col-reverse md:flex-row md:justify-between items-center">
+            <div className="mt-auto md:mt-8 pt-4 md:pt-6 border-t border-gray-100 flex gap-3 flex-col-reverse md:flex-row md:justify-between items-center sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 bg-white md:bg-transparent pb-4 md:pb-0 z-10">
               <Button variant="ghost" className="w-full md:w-auto" onClick={() => setStep(1)}>Back</Button>
               <Button className="w-full md:w-auto" onClick={handleSurroundingsContinue} disabled={photos.length < 4}>
                 Continue
@@ -460,7 +460,7 @@ export const DroneLocationSetupPage: React.FC = () => {
               ))}
             </div>
 
-            <div className="mt-auto pt-6 border-t border-gray-100 mt-8 flex gap-3 flex-col-reverse md:flex-row md:justify-between items-center">
+            <div className="mt-auto md:mt-8 pt-4 md:pt-6 border-t border-gray-100 flex gap-3 flex-col-reverse md:flex-row md:justify-between items-center sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 bg-white md:bg-transparent pb-4 md:pb-0 z-10">
               <Button variant="ghost" className="w-full md:w-auto" onClick={() => setStep(2)}>Back</Button>
               <Button className="w-full md:w-auto" onClick={handleSafetyContinue} disabled={!allSafetyConfirmed}>
                 Continue
@@ -534,7 +534,7 @@ export const DroneLocationSetupPage: React.FC = () => {
               )}
             </div>
 
-            <div className="mt-auto pt-6 border-t border-gray-100 mt-8 flex gap-3 flex-col-reverse md:flex-row md:justify-between items-center pb-4">
+            <div className="mt-auto md:mt-8 pt-4 md:pt-6 border-t border-gray-100 flex gap-3 flex-col-reverse md:flex-row md:justify-between items-center sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 bg-white md:bg-transparent pb-4 md:pb-0 z-10">
               <Button variant="ghost" className="w-full md:w-auto" onClick={() => setStep(3)} disabled={isSaving}>Back</Button>
               <Button className="w-full md:w-auto" onClick={handleSaveLocation} isLoading={isSaving}>
                 Save location
