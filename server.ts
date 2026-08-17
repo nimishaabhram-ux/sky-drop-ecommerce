@@ -115,6 +115,62 @@ let orders: any[] = [
     droneId: 'FALCON-X9',
     deliveryNotes: 'Autonomous precision tether descent to backyard grass landing zone.',
     paymentMethod: 'UPI',
+    statusHistory: [
+      { status: 'ORDER_CREATED', timestamp: new Date(Date.now() - 7 * 60 * 1000).toISOString() },
+      { status: 'ORDER_PROCESSING', timestamp: new Date(Date.now() - 6 * 60 * 1000).toISOString() },
+      { status: 'DRONE_ASSIGNED', timestamp: new Date(Date.now() - 4 * 60 * 1000).toISOString() },
+      { status: 'DRONE_FLYING', timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString() },
+    ],
+  },
+  {
+    id: 'ORD-84791',
+    userId: 'user-001',
+    items: [
+      {
+        product: {
+          id: 'prod-05',
+          name: 'Organic Harvest Fresh Vegetable Box',
+          price: 499,
+          imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=80',
+          weightGrams: 2200,
+        },
+        quantity: 1,
+      },
+      {
+        product: {
+          id: 'prod-06',
+          name: 'Premium Basmati Rice 5kg',
+          price: 750,
+          imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&auto=format&fit=crop&q=80',
+          weightGrams: 5000,
+        },
+        quantity: 1,
+      },
+    ],
+    deliveryMethod: 'standard',
+    deliveryAddressId: null,
+    deliveryAddress: null,
+    totalWeightGrams: 7200,
+    subtotal: 1249,
+    deliveryFee: 49,
+    dronePriorityFee: 0,
+    tax: 225,
+    totalAmount: 1523,
+    status: 'DELIVERED',
+    estimatedDeliveryMinutes: 1440,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    trackingNumber: 'SKY-STD-4412',
+    droneId: undefined,
+    deliveryNotes: '',
+    paymentMethod: 'COD',
+    statusHistory: [
+      { status: 'ORDER_CREATED', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+      { status: 'ORDER_PROCESSING', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString() },
+      { status: 'PACKAGE_PREPARING', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString() },
+      { status: 'DRONE_FLYING', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 8 * 60 * 60 * 1000).toISOString() },
+      { status: 'DELIVERED', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+    ],
   },
 ];
 
@@ -391,6 +447,10 @@ app.post('/api/orders', (req, res) => {
     droneId: deliveryMethod === 'drone' ? 'FALCON-X9' : undefined,
     deliveryNotes: req.body.deliveryNotes || '',
     paymentMethod: paymentMethod || 'UPI',
+    statusHistory: [
+      { status: 'ORDER_CREATED', timestamp: new Date().toISOString() },
+      { status: 'ORDER_PROCESSING', timestamp: new Date().toISOString() },
+    ],
   };
 
   orders.unshift(newOrder);

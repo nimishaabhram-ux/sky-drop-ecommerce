@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, ChevronRight, Clock } from 'lucide-react';
+import { Package, Zap, Truck, ArrowRight } from 'lucide-react';
 import { ordersApi } from '../services/ordersApi';
 import { Order } from '../types';
 import { formatCurrency } from '../utils/currency';
+import { getEstimatedArrival } from '../utils/orderProgress';
+import { OrderProgress } from '../components/orders/OrderProgress';
 
 export const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -14,7 +16,6 @@ export const OrdersPage: React.FC = () => {
     const fetchOrders = async () => {
       try {
         const data = await ordersApi.getOrders();
-        // Sort by date descending
         setOrders(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       } catch (err) {
         console.error("Failed to load orders", err);
@@ -22,15 +23,8 @@ export const OrdersPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     fetchOrders();
   }, []);
-
-  const getStatusBadge = (status: string) => {
-    if (status === 'DELIVERED') return <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-green-200">Delivered</span>;
-    if (status === 'CANCELLED') return <span className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-red-200">Cancelled</span>;
-    return <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-blue-200">In Progress</span>;
-  };
 
   const currentOrders = orders.filter(o => o.status !== 'DELIVERED' && o.status !== 'CANCELLED');
   const pastOrders = orders.filter(o => o.status === 'DELIVERED' || o.status === 'CANCELLED');
@@ -63,7 +57,7 @@ export const OrdersPage: React.FC = () => {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-32 bg-gray-100 animate-pulse rounded-3xl"></div>
+            <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-3xl"></div>
           ))}
         </div>
       ) : displayOrders.length === 0 ? (
@@ -84,51 +78,120 @@ export const OrdersPage: React.FC = () => {
       ) : (
         <div className="space-y-5">
           {displayOrders.map(order => (
-            <Link key={order.id} to={`/orders/${order.id}`} className="block group">
-              <div className="bg-white rounded-3xl border border-gray-100 p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex flex-col md:flex-row gap-4 md:gap-6 justify-between items-start md:items-center">
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="font-bold text-gray-900 text-lg">Order #{order.id.slice(0,8)}</span>
-                      {getStatusBadge(order.status)}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-sm text-gray-500 font-medium">
-                      <span className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-lg">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </span>
-                      <span>{order.items.length} {order.items.length === 1 ? 'item' : 'items'}</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
-                      <span className="font-bold text-gray-900">{formatCurrency(order.totalAmount)}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
-                    <div className="flex -space-x-3">
-                      {order.items.slice(0, 3).map((item, idx) => (
-                        <div key={idx} className="w-12 h-12 rounded-full border-2 border-white bg-gray-50 overflow-hidden shadow-sm">
-                          <img src={item.product.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply" />
-                        </div>
-                      ))}
-                      {order.items.length > 3 && (
-                        <div className="w-12 h-12 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600 shadow-sm z-10">
-                          +{order.items.length - 3}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors ml-4 border border-gray-100 group-hover:border-blue-100">
-                      <ChevronRight className="w-5 h-5" />
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </Link>
+            <CurrentOrderCard key={order.id} order={order} isPast={activeTab === 'past'} />
           ))}
         </div>
       )}
+    </div>
+  );
+};
+
+// ── Current / Past Order Card ──
+const CurrentOrderCard: React.FC<{ order: Order; isPast: boolean }> = ({ order, isPast }) => {
+  const isDrone = order.deliveryMethod === 'drone';
+  const isActive = !['DELIVERED', 'CANCELLED', 'DELIVERY_FAILED'].includes(order.status);
+  const eta = getEstimatedArrival(order);
+
+  return (
+    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+      <div className="p-5 md:p-6">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <span className="font-bold text-gray-900 text-lg">Order #{order.id.slice(0, 8)}</span>
+            <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
+              isDrone 
+                ? 'bg-cyan-50 text-cyan-700 border-cyan-200' 
+                : 'bg-blue-50 text-blue-700 border-blue-200'
+            }`}>
+              {isDrone ? <Zap className="w-3 h-3" /> : <Truck className="w-3 h-3" />}
+              {isDrone ? 'Drone delivery' : 'Standard delivery'}
+            </span>
+          </div>
+          {isPast && order.status === 'DELIVERED' && (
+            <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
+              Delivered
+            </span>
+          )}
+          {isPast && order.status === 'CANCELLED' && (
+            <span className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">
+              Cancelled
+            </span>
+          )}
+        </div>
+
+        {/* Date */}
+        <p className="text-sm text-gray-500 font-medium mb-4">
+          {isPast && order.status === 'DELIVERED' 
+            ? `Delivered on ${new Date(order.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`
+            : `Placed ${new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`
+          }
+        </p>
+
+        {/* Product Thumbnails */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex -space-x-3">
+            {order.items.slice(0, 3).map((item, idx) => (
+              <div key={idx} className="w-12 h-12 rounded-xl border-2 border-white bg-gray-50 overflow-hidden shadow-sm">
+                <img src={item.product.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply" />
+              </div>
+            ))}
+            {order.items.length > 3 && (
+              <div className="w-12 h-12 rounded-xl border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600 shadow-sm">
+                +{order.items.length - 3}
+              </div>
+            )}
+          </div>
+          <span className="text-sm text-gray-500 font-medium">
+            {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
+          </span>
+        </div>
+
+        {/* ETA */}
+        {isActive && eta && (
+          <div className="mb-5 bg-blue-50 border border-blue-100 px-4 py-2.5 rounded-xl">
+            <p className="text-sm font-bold text-blue-800">{eta}</p>
+          </div>
+        )}
+
+        {/* Order Progress (compact for list view) */}
+        {!isPast && (
+          <div className="mb-5 pt-4 border-t border-gray-100">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Order progress</p>
+            <OrderProgress order={order} compact />
+          </div>
+        )}
+
+        {/* Total + Actions */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-gray-100">
+          <span className="text-lg font-black text-gray-900">{formatCurrency(order.totalAmount)}</span>
+          
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Link 
+              to={`/orders/${order.id}`}
+              className="text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              View details
+            </Link>
+            {isActive && (
+              <Link
+                to={isDrone ? `/orders/${order.id}/track` : `/orders/${order.id}`}
+                className="inline-flex items-center gap-2 bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors shadow-sm ml-auto sm:ml-0"
+              >
+                Track order <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
+            {isPast && order.status === 'DELIVERED' && (
+              <Link
+                to="/shop"
+                className="inline-flex items-center gap-2 bg-gray-900 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors shadow-sm ml-auto sm:ml-0"
+              >
+                Order again
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

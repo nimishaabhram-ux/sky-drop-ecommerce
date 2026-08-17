@@ -5,6 +5,8 @@ import { ordersApi } from '../services/ordersApi';
 import { Order } from '../types';
 import { Button } from '../components/common/Button';
 import { formatCurrency } from '../utils/currency';
+import { getOrderProgress, getEstimatedArrival } from '../utils/orderProgress';
+import { OrderProgress } from '../components/orders/OrderProgress';
 
 export const OrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,7 +53,9 @@ export const OrderDetailsPage: React.FC = () => {
   }
 
   const isDrone = order.deliveryMethod === 'drone';
-  const isTrackingAvailable = !['DELIVERED', 'CANCELLED', 'DELIVERY_FAILED'].includes(order.status);
+  const isActive = !['DELIVERED', 'CANCELLED', 'DELIVERY_FAILED'].includes(order.status);
+  const progress = getOrderProgress(order);
+  const eta = getEstimatedArrival(order);
 
   return (
     <div className="max-w-[800px] mx-auto px-4 md:px-8 py-6 md:py-8 min-h-screen">
@@ -59,44 +63,42 @@ export const OrderDetailsPage: React.FC = () => {
         <ArrowLeft className="w-4 h-4" /> Back to Orders
       </Link>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900 flex items-center gap-3">
             Order #{order.id.slice(0,8)}
           </h1>
-          <p className="text-gray-500 font-medium mt-1">Placed on {new Date(order.createdAt).toLocaleString()}</p>
+          <p className="text-gray-500 font-medium mt-1">
+            Placed on {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
+          </p>
         </div>
-        <div className={`px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider border ${
-          order.status === 'DELIVERED' ? 'bg-green-50 text-green-700 border-green-200' : 
-          order.status === 'CANCELLED' ? 'bg-red-50 text-red-700 border-red-200' : 
-          'bg-blue-50 text-blue-700 border-blue-200'
+        <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border ${
+          isDrone 
+            ? 'bg-cyan-50 text-cyan-700 border-cyan-200' 
+            : 'bg-blue-50 text-blue-700 border-blue-200'
         }`}>
-          {order.status.replace(/_/g, ' ')}
-        </div>
+          {isDrone ? <Zap className="w-3.5 h-3.5" /> : <Truck className="w-3.5 h-3.5" />}
+          {isDrone ? 'Drone delivery' : 'Standard delivery'}
+        </span>
       </div>
 
-      {/* Tracking Call to action */}
-      {isTrackingAvailable ? (
+      {/* Status Banner */}
+      {isActive ? (
         <div className="mb-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
           <div className="absolute -top-10 -right-10 opacity-20">
             {isDrone ? <Zap className="w-64 h-64" /> : <Truck className="w-64 h-64" />}
           </div>
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <div className="flex items-center gap-2 mb-2 bg-blue-500/50 w-max px-3 py-1 rounded-lg backdrop-blur-sm">
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                <span className="text-sm font-bold uppercase tracking-wider">Live Status</span>
-              </div>
-              <h3 className="text-2xl font-bold mb-2">
-                {isDrone ? 'Drone is preparing for flight' : 'Order is on the way'}
-              </h3>
-              <p className="text-blue-100 font-medium">Arriving in approx {order.estimatedDeliveryMinutes} mins.</p>
+              <h3 className="text-2xl font-bold mb-1">{progress.currentLabel}</h3>
+              <p className="text-blue-100 font-medium">{eta || progress.description}</p>
             </div>
-            <Link to={`/orders/${order.id}/track`} className="w-full md:w-auto">
-              <Button className="w-full md:w-auto bg-white text-blue-600 hover:bg-gray-50 shrink-0 flex items-center justify-center gap-2 shadow-md rounded-2xl h-14 px-8 text-lg">
-                Track order <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
+            {isDrone && (
+              <Link to={`/orders/${order.id}/track`} className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-gray-50 font-bold shadow-md rounded-2xl h-14 px-8 text-lg transition-colors">
+                Track live <ArrowRight className="w-5 h-5" />
+              </Link>
+            )}
           </div>
         </div>
       ) : order.status === 'DELIVERED' ? (
@@ -106,10 +108,30 @@ export const OrderDetailsPage: React.FC = () => {
           </div>
           <div>
             <h3 className="text-lg font-bold text-green-900">Delivered successfully</h3>
-            <p className="text-green-700 text-sm font-medium">Your order was delivered on {new Date(order.updatedAt).toLocaleString()}</p>
+            <p className="text-green-700 text-sm font-medium">
+              Delivered on {new Date(order.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
+            </p>
+          </div>
+        </div>
+      ) : order.status === 'CANCELLED' ? (
+        <div className="mb-8 bg-red-50 rounded-3xl p-6 border border-red-100 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+            <Package className="w-6 h-6 text-red-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-red-900">Order cancelled</h3>
+            <p className="text-red-700 text-sm font-medium">
+              Cancelled on {new Date(order.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </p>
           </div>
         </div>
       ) : null}
+
+      {/* Order Progress Timeline */}
+      <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <h3 className="font-bold text-gray-900 text-lg mb-6">Order Progress</h3>
+        <OrderProgress order={order} showTimestamps />
+      </div>
 
       {/* Delivery Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -118,19 +140,28 @@ export const OrderDetailsPage: React.FC = () => {
             <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
               <MapPin className="w-4 h-4 text-gray-600" />
             </div>
-            Delivery Address
+            Delivery Location
           </h3>
           {order.deliveryLocation ? (
             <div className="ml-10">
               <p className="font-bold text-gray-900">{order.deliveryLocation.name}</p>
               <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                {order.deliveryLocation.address}
+                {order.deliveryLocation.address || `${order.deliveryLocation.latitude.toFixed(4)}, ${order.deliveryLocation.longitude.toFixed(4)}`}
+              </p>
+            </div>
+          ) : order.deliveryAddress ? (
+            <div className="ml-10">
+              <p className="font-bold text-gray-900">{order.deliveryAddress.recipientName}</p>
+              <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                {order.deliveryAddress.addressLine1}
+                {order.deliveryAddress.addressLine2 && <><br />{order.deliveryAddress.addressLine2}</>}
+                <br />{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.postalCode}
               </p>
             </div>
           ) : (
             <div className="ml-10">
-              <p className="font-bold text-gray-900">Standard Address</p>
-              <p className="text-sm text-gray-500 mt-1 leading-relaxed">123 Example Street<br/>San Francisco, CA</p>
+              <p className="font-bold text-gray-900">Delivery Address</p>
+              <p className="text-sm text-gray-500 mt-1 leading-relaxed">Standard delivery address</p>
             </div>
           )}
         </div>
@@ -143,9 +174,12 @@ export const OrderDetailsPage: React.FC = () => {
             Delivery Method
           </h3>
           <div className="ml-10">
-            <p className="font-bold text-gray-900">{isDrone ? 'Drone Drop' : 'Standard Delivery'}</p>
+            <p className="font-bold text-gray-900">{isDrone ? 'Drone Priority' : 'Standard Delivery'}</p>
             <p className="text-sm text-gray-500 mt-1">
-              Estimated time: {order.estimatedDeliveryMinutes} minutes
+              {isDrone 
+                ? `Est. ${order.estimatedDeliveryMinutes} min delivery` 
+                : `Est. delivery in ${order.estimatedDeliveryMinutes >= 1440 ? '1-2 days' : `${order.estimatedDeliveryMinutes} min`}`
+              }
             </p>
           </div>
         </div>
@@ -178,7 +212,7 @@ export const OrderDetailsPage: React.FC = () => {
         </ul>
       </div>
 
-      {/* Receipt */}
+      {/* Payment Summary */}
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm">
         <h3 className="font-bold text-gray-900 mb-6 text-lg">Payment Summary</h3>
         <div className="space-y-4 font-medium mb-6">
