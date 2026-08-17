@@ -1,0 +1,11 @@
+{
+  "name": "SkyDrop Drone Delivery",
+  "description": "Mobile-first PWA for autonomous drone delivery, multi-angle camera landing zone scanning, 360° visual photogrammetry verification, real-time live telemetry tracking, and order management.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

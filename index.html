@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" class="h-full bg-[#0A0A0B] text-[#F5F5F5] antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>SKYDROP // Precision Autonomous Drone Delivery</title>
+    <meta name="description" content="Next-generation autonomous drone delivery platform with multi-angle landing zone 360 scanning, real-time GPS telemetry, and rapid package delivery." />
+    
+    <!-- PWA & Mobile Web App Meta -->
+    <meta name="theme-color" content="#0A0A0B" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SkyDrop" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body class="h-full bg-[#0A0A0B] text-[#F5F5F5] selection:bg-white selection:text-black overflow-x-hidden font-sans">
+    <div id="root" class="h-full flex flex-col"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
