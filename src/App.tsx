@@ -1,129 +1,53 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Header } from './components/layout/Header';
+import { Footer } from './components/layout/Footer';
+import { MobileNavigation } from './components/layout/MobileNavigation';
 
-import React, { useState } from 'react';
-import { Navbar } from './components/Navbar';
-import { BottomNav, ActiveTab } from './components/BottomNav';
-import { HomeScreen } from './components/HomeScreen';
-import { ProductCatalog } from './components/ProductCatalog';
-import { ProductModal } from './components/ProductModal';
-import { CartCheckoutModal } from './components/CartCheckoutModal';
-import { CartItem, Order, Product } from './types';
-import { INITIAL_USER, INITIAL_WEATHER, INITIAL_PRODUCTS, INITIAL_LOCATIONS, INITIAL_ACTIVE_ORDER } from './data/mockData';
+// Pages
+import { HomePage } from './pages/HomePage';
+import { ShopPage } from './pages/ShopPage';
+import { ProductPage } from './pages/ProductPage';
+import { CartPage } from './pages/CartPage';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { OrdersPage } from './pages/OrdersPage';
+import { OrderDetailsPage } from './pages/OrderDetailsPage';
+import { OrderTrackingPage } from './pages/OrderTrackingPage';
+import { AccountPage } from './pages/AccountPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { DroneSettingsPage } from './pages/DroneSettingsPage';
+import { DroneLocationSetupPage } from './pages/DroneLocationSetupPage';
+
+// Context Providers
+import { CartProvider } from './context/CartContext';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [activeOrder, setActiveOrder] = useState<Order | null>(INITIAL_ACTIVE_ORDER);
-  
-  // Modals state
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-  const handleAddToCart = (product: Product, quantity: number = 1) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
-        );
-      }
-      return [...prev, { product, quantity }];
-    });
-  };
-
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      setCart((prev) => prev.filter((item) => item.product.id !== productId));
-    } else {
-      setCart((prev) =>
-        prev.map((item) => (item.product.id === productId ? { ...item, quantity } : item))
-      );
-    }
-  };
-
-  const handleRemoveItem = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  };
-
-  const handleOrderPlaced = (order: Order) => {
-    setActiveOrder(order);
-    setActiveTab('track');
-  };
-
   return (
-    <div className="min-h-full flex flex-col relative pb-16">
-      <Navbar 
-        user={INITIAL_USER}
-        cart={cart}
-        notifications={[]}
-        onOpenCart={() => setIsCartOpen(true)}
-        onOpenNotifications={() => {}}
-        onOpenAccount={() => {}}
-        onOpenAuth={() => {}}
-      />
-
-      <main className="flex-1 flex flex-col relative overflow-y-auto">
-        {activeTab === 'home' && (
-          <HomeScreen 
-            user={INITIAL_USER}
-            weather={INITIAL_WEATHER}
-            locations={INITIAL_LOCATIONS}
-            activeOrder={activeOrder}
-            products={INITIAL_PRODUCTS}
-            onSelectTab={setActiveTab}
-            onAddToCart={(product) => handleAddToCart(product, 1)}
-            onViewProduct={setSelectedProduct}
-            onStartSetup={() => setActiveTab('drone-setup')}
-          />
-        )}
-
-        {activeTab === 'catalog' && (
-          <ProductCatalog 
-            products={INITIAL_PRODUCTS}
-            onAddToCart={(product) => handleAddToCart(product, 1)}
-            onViewProduct={setSelectedProduct}
-          />
-        )}
-        
-        {/* Placeholders for other tabs */}
-        {(activeTab === 'track' || activeTab === 'drone-setup' || activeTab === 'account') && (
-          <div className="flex-1 flex items-center justify-center text-neutral-500 font-mono-tech uppercase tracking-widest p-8 text-center">
-            {activeTab.replace('-', ' ')} module under construction
-          </div>
-        )}
-      </main>
-
-      <BottomNav 
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        activeOrderCount={activeOrder && activeOrder.status !== 'DELIVERED' ? 1 : 0}
-      />
-
-      {selectedProduct && (
-        <ProductModal 
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-          onAddToCart={handleAddToCart}
-        />
-      )}
-
-      <CartCheckoutModal 
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cart={cart}
-        locations={INITIAL_LOCATIONS}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onClearCart={() => setCart([])}
-        onStartSetup={() => {
-          setIsCartOpen(false);
-          setActiveTab('drone-setup');
-        }}
-        onOrderPlaced={handleOrderPlaced}
-      />
-    </div>
+    <CartProvider>
+      <Router>
+        <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans pb-16 md:pb-0">
+          <Header />
+          <main className="flex-1 w-full relative">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/product/:id" element={<ProductPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/orders/:id" element={<OrderDetailsPage />} />
+              <Route path="/orders/:id/track" element={<OrderTrackingPage />} />
+              <Route path="/account" element={<AccountPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings/drone" element={<DroneSettingsPage />} />
+              <Route path="/settings/drone/location/new" element={<DroneLocationSetupPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+          <Footer />
+          <MobileNavigation />
+        </div>
+      </Router>
+    </CartProvider>
   );
 }

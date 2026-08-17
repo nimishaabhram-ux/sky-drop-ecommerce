@@ -3,11 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ArrowLeft, Battery, Wind, Signal, Navigation, Package, Zap } from 'lucide-react';
+import { ArrowLeft, Battery, Wind, Navigation, Package, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { DroneTelemetry, Order } from '../types';
 import { ordersApi } from '../services/ordersApi';
-import { Card } from '../components/common/Card';
-import { Badge } from '../components/common/Badge';
 
 // Fix Leaflet default icon issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -33,17 +31,15 @@ export const OrderTrackingPage: React.FC = () => {
   const [telemetry, setTelemetry] = useState<DroneTelemetry | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [route, setRoute] = useState<[number, number][]>([]);
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
 
-  // Fetch Order
   useEffect(() => {
     if (!id) return;
     ordersApi.getOrder(id).then(setOrder).catch(console.error);
   }, [id]);
 
-  // Subscribe to SSE
   useEffect(() => {
     if (!id) return;
-
     let eventSource: EventSource;
 
     const connectSSE = () => {
@@ -81,13 +77,12 @@ export const OrderTrackingPage: React.FC = () => {
 
   if (!order) {
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-50">
+      <div className="flex items-center justify-center h-screen bg-white">
         <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
-  // Fallback coords if no telemetry yet
   const defaultCenter: [number, number] = [37.7749, -122.4194];
   const currentPos: [number, number] = telemetry 
     ? [telemetry.latitude, telemetry.longitude] 
@@ -98,17 +93,20 @@ export const OrderTrackingPage: React.FC = () => {
   const getStatusText = (status: string) => status.replace(/_/g, ' ');
 
   return (
-    <div className="h-screen md:h-[calc(100vh-64px)] w-full flex flex-col relative bg-slate-50">
+    <div className="h-screen md:h-[calc(100vh-64px)] w-full flex flex-col relative bg-white">
       {/* Header overlay */}
       <div className="absolute top-4 left-4 right-4 z-[400] pointer-events-none flex justify-between items-start">
-        <Link to={`/orders/${id}`} className="pointer-events-auto bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md text-slate-700 hover:text-slate-900 transition-colors">
-          <ArrowLeft className="w-6 h-6" />
+        <Link to={`/orders/${id}`} className="pointer-events-auto bg-white/90 backdrop-blur-md p-3 rounded-full shadow-sm border border-gray-100 text-gray-700 hover:text-gray-900 transition-colors">
+          <ArrowLeft className="w-5 h-5" />
         </Link>
 
         <div className="pointer-events-auto flex gap-2">
-          <Badge variant={connectionStatus === 'connected' ? 'success' : connectionStatus === 'connecting' ? 'warning' : 'danger'} className="shadow-sm bg-white/90 backdrop-blur-sm">
-            {connectionStatus === 'connected' ? 'Live Telemetry' : connectionStatus === 'connecting' ? 'Connecting...' : 'Connection Lost'}
-          </Badge>
+          <span className={`shadow-sm bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
+            connectionStatus === 'connected' ? 'text-green-600 border-green-100' : 
+            connectionStatus === 'connecting' ? 'text-yellow-600 border-yellow-100' : 'text-red-600 border-red-100'
+          }`}>
+            {connectionStatus === 'connected' ? 'Live GPS' : connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+          </span>
         </div>
       </div>
 
@@ -125,74 +123,94 @@ export const OrderTrackingPage: React.FC = () => {
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
           
-          {/* Destination Marker */}
           {order.deliveryLocation && (
             <Marker position={[order.deliveryLocation.latitude, order.deliveryLocation.longitude]}>
               <Popup>Delivery Location: {order.deliveryLocation.name}</Popup>
             </Marker>
           )}
 
-          {/* Drone Marker */}
           {telemetry && (
             <Marker position={[telemetry.latitude, telemetry.longitude]} icon={droneIcon}>
-              <Popup>SkyDrop Drone #{telemetry.droneId}</Popup>
+              <Popup>SkyDrop Drone</Popup>
             </Marker>
           )}
 
-          {/* Route History */}
           {route.length > 1 && (
             <Polyline positions={route} color="#2563eb" weight={4} opacity={0.8} />
           )}
         </MapContainer>
       </div>
 
-      {/* Telemetry Dashboard */}
-      <div className="bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-6 z-[400] relative w-full md:w-96 md:absolute md:bottom-8 md:right-8 md:rounded-3xl">
-        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 md:hidden"></div>
-        
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 capitalize mb-1">
-              {telemetry ? getStatusText(telemetry.status) : getStatusText(order.status)}
-            </h2>
-            <p className="text-sm text-slate-500">
-              {telemetry?.etaSeconds ? `Arriving in ${Math.ceil(telemetry.etaSeconds / 60)} mins` : 'Calculating ETA...'}
-            </p>
+      {/* Tracking Dashboard */}
+      <div className="bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-[400] relative w-full md:w-[400px] md:absolute md:top-4 md:right-4 md:bottom-4 md:rounded-3xl md:h-auto flex flex-col overflow-hidden">
+        <div className="p-6 pb-0 flex-1 overflow-y-auto">
+          <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 md:hidden"></div>
+          
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
+              <Package className="w-7 h-7 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-gray-900 capitalize leading-tight">
+                {telemetry ? getStatusText(telemetry.status) : getStatusText(order.status)}
+              </h2>
+              {telemetry?.etaSeconds && (
+                <p className="text-blue-600 font-bold mt-1 text-sm">
+                  Arriving in <span className="text-lg">{Math.ceil(telemetry.etaSeconds / 60)}</span> mins
+                </p>
+              )}
+            </div>
           </div>
-          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
-            <Package className="w-6 h-6" />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
-            <Navigation className="w-5 h-5 text-slate-400 shrink-0" />
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Altitude</p>
-              <p className="text-sm font-bold text-slate-900">{telemetry?.altitude ? `${Math.round(telemetry.altitude)}m` : '--'}</p>
+          <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
+            <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wider">Order Items</h3>
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {order.items.slice(0, 3).map((item, idx) => (
+                  <div key={idx} className="w-10 h-10 rounded-full border-2 border-white bg-white overflow-hidden shadow-sm">
+                    <img src={item.product.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply p-1" />
+                  </div>
+                ))}
+              </div>
+              <div className="text-sm font-medium text-gray-600">
+                {order.items.length} {order.items.length === 1 ? 'item' : 'items'} on the way
+              </div>
             </div>
           </div>
-          <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
-            <Zap className="w-5 h-5 text-slate-400 shrink-0" />
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Speed</p>
-              <p className="text-sm font-bold text-slate-900">{telemetry?.speedKmh ? `${Math.round(telemetry.speedKmh)} km/h` : '--'}</p>
+
+          {/* Technical Details Toggle */}
+          <button 
+            onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+            className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl text-left hover:bg-gray-50 transition-colors"
+          >
+            <span className="font-bold text-gray-700 text-sm">Flight Details</span>
+            {showTechnicalDetails ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+          </button>
+
+          {showTechnicalDetails && (
+            <div className="grid grid-cols-2 gap-3 mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="bg-gray-50 border border-gray-100 p-3 rounded-2xl flex flex-col gap-1">
+                <Navigation className="w-4 h-4 text-gray-400" />
+                <p className="text-xs text-gray-500 font-medium">Altitude</p>
+                <p className="text-sm font-bold text-gray-900">{telemetry?.altitude ? `${Math.round(telemetry.altitude)}m` : '--'}</p>
+              </div>
+              <div className="bg-gray-50 border border-gray-100 p-3 rounded-2xl flex flex-col gap-1">
+                <Zap className="w-4 h-4 text-gray-400" />
+                <p className="text-xs text-gray-500 font-medium">Speed</p>
+                <p className="text-sm font-bold text-gray-900">{telemetry?.speedKmh ? `${Math.round(telemetry.speedKmh)} km/h` : '--'}</p>
+              </div>
+              <div className="bg-gray-50 border border-gray-100 p-3 rounded-2xl flex flex-col gap-1">
+                <Battery className={`w-4 h-4 ${telemetry && telemetry.batteryPercent < 20 ? 'text-red-500' : 'text-gray-400'}`} />
+                <p className="text-xs text-gray-500 font-medium">Battery</p>
+                <p className="text-sm font-bold text-gray-900">{telemetry?.batteryPercent ? `${Math.round(telemetry.batteryPercent)}%` : '--'}</p>
+              </div>
+              <div className="bg-gray-50 border border-gray-100 p-3 rounded-2xl flex flex-col gap-1">
+                <Wind className="w-4 h-4 text-gray-400" />
+                <p className="text-xs text-gray-500 font-medium">Wind</p>
+                <p className="text-sm font-bold text-gray-900">{telemetry?.windSpeedKmh ? `${Math.round(telemetry.windSpeedKmh)} km/h` : '--'}</p>
+              </div>
             </div>
-          </div>
-          <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
-            <Battery className={`w-5 h-5 shrink-0 ${telemetry && telemetry.batteryPercent < 20 ? 'text-red-500' : 'text-slate-400'}`} />
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Battery</p>
-              <p className="text-sm font-bold text-slate-900">{telemetry?.batteryPercent ? `${Math.round(telemetry.batteryPercent)}%` : '--'}</p>
-            </div>
-          </div>
-          <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
-            <Wind className="w-5 h-5 text-slate-400 shrink-0" />
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Wind</p>
-              <p className="text-sm font-bold text-slate-900">{telemetry?.windSpeedKmh ? `${Math.round(telemetry.windSpeedKmh)} km/h` : '--'}</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

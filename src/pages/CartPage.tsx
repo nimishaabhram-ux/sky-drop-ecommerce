@@ -10,71 +10,80 @@ export const CartPage: React.FC = () => {
 
   if (cart.length === 0) {
     return (
-      <div className="px-4 py-20 max-w-3xl mx-auto w-full flex flex-col items-center justify-center text-center">
-        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6">
-          <ShoppingBag className="w-10 h-10 text-slate-300" />
+      <div className="px-4 py-20 max-w-3xl mx-auto w-full flex flex-col items-center justify-center text-center min-h-[60vh]">
+        <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+          <ShoppingBag className="w-12 h-12 text-gray-300" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Your cart is empty</h2>
-        <p className="text-slate-600 mb-8 max-w-md">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+        <p className="text-gray-500 mb-8 max-w-md">
           Looks like you haven't added anything to your cart yet. Browse our catalog to find what you need.
         </p>
         <Link to="/shop">
-          <Button size="lg">Start Shopping</Button>
+          <Button size="lg" className="rounded-xl px-8">Start Shopping</Button>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full">
-      <h1 className="text-3xl font-bold text-slate-900 mb-8">Shopping Cart</h1>
+    <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-8">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">Shopping Cart</h1>
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
         
         {/* Cart Items */}
         <div className="flex-1">
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-            <ul className="divide-y divide-slate-200">
+          <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+            <ul className="divide-y divide-gray-100">
               {cart.map((item) => (
                 <li key={item.product.id} className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
                   {/* Item Image */}
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-slate-100 rounded-xl overflow-hidden shrink-0">
+                  <Link to={`/product/${item.product.id}`} className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-50 rounded-2xl overflow-hidden shrink-0 border border-gray-100">
                     <img 
                       src={item.product.imageUrl} 
                       alt={item.product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover mix-blend-multiply"
                     />
-                  </div>
+                  </Link>
                   
                   {/* Item Details */}
                   <div className="flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 className="font-semibold text-slate-900 text-lg">
-                          <Link to={`/product/${item.product.id}`} className="hover:text-blue-600">
+                        <h3 className="font-bold text-gray-900 text-lg line-clamp-2 pr-4">
+                          <Link to={`/product/${item.product.id}`} className="hover:text-blue-600 transition-colors">
                             {item.product.name}
                           </Link>
                         </h3>
-                        <p className="text-sm text-slate-500 capitalize">{item.product.category}</p>
+                        <p className="text-sm text-gray-500 mt-1 capitalize">{item.product.category}</p>
                       </div>
-                      <span className="font-bold text-slate-900 text-lg">
-                        ${(item.product.price * item.quantity).toFixed(2)}
-                      </span>
+                      <div className="text-right shrink-0">
+                        <span className="font-bold text-gray-900 text-lg block">
+                          ${(item.product.price * item.quantity).toFixed(2)}
+                        </span>
+                        {item.product.originalPrice && (
+                          <span className="text-sm text-gray-400 line-through">
+                            ${(item.product.originalPrice * item.quantity).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="mt-auto flex items-center justify-between pt-4">
                       {/* Quantity Selector */}
-                      <div className="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
+                      <div className="flex items-center bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                         <button 
                           onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white text-slate-600 hover:text-slate-900 transition-all"
+                          className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
-                        <span className="w-10 text-center font-medium text-sm">{item.quantity}</span>
+                        <div className="w-10 h-10 flex items-center justify-center font-bold text-gray-900 border-x border-gray-200 text-sm">
+                          {item.quantity}
+                        </div>
                         <button 
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white text-slate-600 hover:text-slate-900 transition-all"
+                          className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
                         >
                           <Plus className="w-4 h-4" />
                         </button>
@@ -82,9 +91,10 @@ export const CartPage: React.FC = () => {
 
                       <button 
                         onClick={() => removeFromCart(item.product.id)}
-                        className="text-sm font-medium text-red-600 hover:text-red-700 flex items-center gap-1"
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        aria-label="Remove item"
                       >
-                        <Trash2 className="w-4 h-4" /> Remove
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
@@ -95,43 +105,43 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* Order Summary */}
-        <div className="w-full lg:w-96 shrink-0">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm sticky top-24">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Order Summary</h2>
+        <div className="w-full lg:w-[380px] shrink-0">
+          <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm sticky top-24">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
             
             <div className="space-y-4 mb-6">
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span className="font-medium text-slate-900">${cartSubtotal.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">${cartSubtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-gray-600">
                 <span>Estimated Tax</span>
-                <span className="font-medium text-slate-900">${(cartSubtotal * 0.08).toFixed(2)}</span>
+                <span className="font-medium text-gray-900">${(cartSubtotal * 0.08).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-slate-600 text-sm">
+              <div className="flex justify-between text-gray-500 text-sm">
                 <span>Delivery Fee</span>
                 <span>Calculated at checkout</span>
               </div>
             </div>
 
-            <div className="border-t border-slate-200 pt-4 mb-8">
+            <div className="border-t border-gray-100 pt-4 mb-8">
               <div className="flex justify-between items-end">
-                <span className="font-bold text-slate-900">Total</span>
+                <span className="font-bold text-gray-900 text-lg">Total</span>
                 <div className="text-right">
-                  <span className="text-2xl font-bold text-slate-900">
+                  <span className="text-2xl font-black text-gray-900 block leading-none">
                     ${(cartSubtotal * 1.08).toFixed(2)}
                   </span>
-                  <p className="text-xs text-slate-500 mt-1">Excluding delivery</p>
+                  <p className="text-xs text-gray-500 mt-1">Excluding delivery</p>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-3">
-              <Button size="lg" onClick={() => navigate('/checkout')} className="w-full flex items-center justify-center gap-2">
-                Continue to checkout <ArrowRight className="w-4 h-4" />
+              <Button size="lg" onClick={() => navigate('/checkout')} className="w-full rounded-2xl h-14 text-lg shadow-md flex items-center justify-center gap-2">
+                Checkout <ArrowRight className="w-5 h-5" />
               </Button>
               <Link to="/shop">
-                <Button size="lg" variant="ghost" fullWidth>
+                <Button size="lg" variant="ghost" className="w-full rounded-2xl h-14 text-gray-600 hover:bg-gray-50">
                   Continue shopping
                 </Button>
               </Link>

@@ -1,150 +1,141 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Zap, Box, Clock } from 'lucide-react';
-import { mockProducts } from '../data/mockData';
+import { Search, ChevronRight, Zap, ShoppingBag, Coffee, Apple, Pill, Phone, Laptop, Heart } from 'lucide-react';
+import { INITIAL_PRODUCTS } from '../data/mockData';
 import { ProductCard } from '../components/products/ProductCard';
-import { Button } from '../components/common/Button';
-import { useCart } from '../context/CartContext';
+
+const categories = [
+  { name: 'Groceries', icon: Apple, color: 'bg-green-100 text-green-600' },
+  { name: 'Food', icon: Coffee, color: 'bg-orange-100 text-orange-600' },
+  { name: 'Medicine', icon: Pill, color: 'bg-red-100 text-red-600' },
+  { name: 'Essentials', icon: ShoppingBag, color: 'bg-blue-100 text-blue-600' },
+  { name: 'Electronics', icon: Laptop, color: 'bg-purple-100 text-purple-600' },
+  { name: 'Personal Care', icon: Heart, color: 'bg-pink-100 text-pink-600' },
+];
 
 export const HomePage: React.FC = () => {
-  const { addToCart } = useCart();
-  
-  // Get subsets of products for different sections
-  const popularProducts = mockProducts.slice(0, 4);
-  const droneProducts = mockProducts.filter(p => p.isDroneOptimized).slice(0, 4);
-
-  const categories = [
-    { id: 'medical', name: 'Medical', icon: '💊', color: 'bg-red-50 text-red-700' },
-    { id: 'food', name: 'Food', icon: '🍔', color: 'bg-amber-50 text-amber-700' },
-    { id: 'bakery', name: 'Bakery', icon: '🥐', color: 'bg-orange-50 text-orange-700' },
-    { id: 'tech', name: 'Tech', icon: '💻', color: 'bg-blue-50 text-blue-700' },
-    { id: 'essentials', name: 'Essentials', icon: '🧻', color: 'bg-teal-50 text-teal-700' },
-  ];
+  const popularProducts = INITIAL_PRODUCTS.slice(0, 4);
+  const recommendedProducts = INITIAL_PRODUCTS.slice(4, 8);
 
   return (
-    <div className="flex flex-col gap-12 pb-12">
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 text-white rounded-b-3xl md:rounded-3xl md:mt-6 overflow-hidden mx-0 md:mx-4 lg:mx-8">
-        {/* Subtle background element */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500 rounded-full blur-3xl transform -translate-x-1/3 translate-y-1/3"></div>
+    <div className="pb-8">
+      {/* Promo Hero Banner */}
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-8">
+        <div className="bg-blue-600 rounded-3xl overflow-hidden relative shadow-lg">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+          <div className="relative z-10 px-6 py-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="max-w-xl text-center md:text-left">
+              <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-4 tracking-tight">
+                Get everyday essentials delivered faster
+              </h1>
+              <p className="text-blue-100 text-lg md:text-xl mb-8">
+                Order groceries, food, medicine and more with standard or drone delivery directly to you.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Link to="/shop" className="bg-white text-blue-600 px-8 py-3.5 rounded-xl font-bold text-lg hover:bg-blue-50 transition-colors text-center shadow-sm">
+                  Shop now
+                </Link>
+                <Link to="/settings/drone" className="bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold text-lg hover:bg-blue-800 transition-colors text-center border border-blue-500">
+                  Explore drone delivery
+                </Link>
+              </div>
+            </div>
+            
+            <div className="hidden md:block w-72 h-72 relative">
+              {/* Abstract clean drone/package graphic */}
+              <div className="absolute inset-0 bg-white/10 rounded-full animate-pulse"></div>
+              <div className="absolute inset-4 bg-white/20 rounded-full"></div>
+              <div className="absolute inset-0 flex items-center justify-center text-white">
+                <Zap className="w-32 h-32 opacity-90" />
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="relative px-6 py-16 sm:py-24 md:p-20 flex flex-col items-start max-w-2xl">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-            Everyday essentials, <span className="text-blue-400">delivered faster.</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-slate-300 mb-10 max-w-lg leading-relaxed">
-            Order food, essentials, medical supplies and technology with standard or drone delivery where available.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <Link to="/shop" className="w-full sm:w-auto">
-              <Button size="lg" fullWidth className="bg-blue-600 hover:bg-blue-500 text-white border-0">
-                Shop now
-              </Button>
-            </Link>
-            <Link to="/settings/drone/location/new" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" fullWidth className="bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm">
-                Set up drone delivery
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Highlights */}
-      <section className="px-4 md:px-8 max-w-7xl mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
-              <Zap className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">Ultra-fast delivery</h3>
-              <p className="text-sm text-slate-500">Drone delivery in under 15 mins</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
-            <div className="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center shrink-0">
-              <Box className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">Safe & secure</h3>
-              <p className="text-sm text-slate-500">Precision landing technology</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
-            <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shrink-0">
-              <Clock className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">Real-time tracking</h3>
-              <p className="text-sm text-slate-500">Know exactly where your order is</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Shop by Category */}
-      <section className="px-4 md:px-8 max-w-7xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Shop by category</h2>
-        </div>
-        <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+      {/* Categories */}
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">What are you looking for?</h2>
+        <div className="flex gap-4 md:gap-6 overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
           {categories.map((cat) => (
             <Link 
-              key={cat.id} 
-              to={`/shop?category=${cat.id}`}
-              className="flex flex-col items-center gap-3 snap-start min-w-[100px] sm:min-w-[120px] group"
+              key={cat.name} 
+              to={`/shop?category=${cat.name}`}
+              className="flex flex-col items-center gap-3 min-w-[80px] md:min-w-[100px] group"
             >
-              <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full ${cat.color} flex items-center justify-center text-3xl sm:text-4xl transition-transform group-hover:scale-105 shadow-sm border border-slate-100`}>
-                {cat.icon}
+              <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 group-active:scale-95 ${cat.color}`}>
+                <cat.icon className="w-8 h-8 md:w-10 md:h-10" />
               </div>
-              <span className="text-sm font-medium text-slate-700">{cat.name}</span>
+              <span className="text-sm font-medium text-gray-700 text-center">{cat.name}</span>
             </Link>
           ))}
         </div>
-      </section>
+      </div>
 
       {/* Popular Products */}
-      <section className="px-4 md:px-8 max-w-7xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Popular near you</h2>
-          <Link to="/shop" className="text-blue-600 font-medium flex items-center gap-1 hover:text-blue-700">
-            View all <ArrowRight className="w-4 h-4" />
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-8">
+        <div className="flex items-end justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Popular near you</h2>
+          <Link to="/shop" className="text-blue-600 font-medium hover:text-blue-700 flex items-center text-sm">
+            See all <ChevronRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {popularProducts.map((product) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
-              onAddToCart={(p) => addToCart(p, 1)} 
-            />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {popularProducts.map(product => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* Fast Drone Delivery Section */}
-      <section className="px-4 md:px-8 max-w-7xl mx-auto w-full">
-        <div className="bg-cyan-50 border border-cyan-100 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Fast drone delivery</h2>
-          <p className="text-slate-600 max-w-xl mb-6">
-            Get these items delivered to your home or outdoor location in minutes using our autonomous drone fleet.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full text-left">
-            {droneProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                onAddToCart={(p) => addToCart(p, 1)} 
-              />
-            ))}
+      {/* Drone Delivery Promo */}
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-8">
+        <div className="bg-cyan-50 border border-cyan-100 rounded-3xl p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex-1">
+            <div className="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-xl flex items-center justify-center mb-4">
+              <Zap className="w-6 h-6" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Get it faster with SkyDrop Drone
+            </h2>
+            <p className="text-gray-600 text-lg mb-6 max-w-xl">
+              Eligible products can be delivered directly to your saved drone delivery location in 10-15 minutes.
+            </p>
+            <ul className="space-y-2 mb-8">
+              <li className="flex items-center gap-2 text-gray-700">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500"></div> Faster delivery
+              </li>
+              <li className="flex items-center gap-2 text-gray-700">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500"></div> Live order tracking
+              </li>
+              <li className="flex items-center gap-2 text-gray-700">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500"></div> Saved delivery locations
+              </li>
+            </ul>
+            <Link to="/settings/drone" className="inline-flex bg-cyan-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-cyan-700 transition-colors">
+              Set up drone delivery
+            </Link>
+          </div>
+          <div className="hidden md:block w-1/3">
+            <img 
+              src="https://images.unsplash.com/photo-1579820010410-c10411aaaa88?auto=format&fit=crop&q=80&w=800" 
+              alt="Drone Delivery" 
+              className="rounded-2xl shadow-lg object-cover h-64 w-full"
+            />
           </div>
         </div>
-      </section>
-      
+      </div>
+
+      {/* Recommended Products */}
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Recommended for you</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {recommendedProducts.map(product => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 };
+

@@ -1,34 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Package, Twitter, Instagram, Facebook } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-slate-50 border-t border-slate-200 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="text-xl font-bold tracking-tight text-slate-900">
-              SkyDrop
+    <footer className="bg-white border-t border-gray-200 mt-12 pb-20 md:pb-0">
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          
+          <div className="md:col-span-1">
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <Package className="w-8 h-8 text-blue-600" />
+              <span className="text-2xl font-bold text-gray-900 tracking-tight">SkyDrop</span>
             </Link>
-            <p className="mt-2 text-sm text-slate-500">
-              Everyday essentials, delivered faster.
+            <p className="text-gray-500 text-sm mb-6">
+              Get everyday essentials delivered faster. Standard or drone delivery straight to your location.
             </p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-slate-900 mb-3">Shop</h3>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li><Link to="/shop" className="hover:text-blue-600 transition-colors">All Products</Link></li>
-              <li><Link to="/shop?category=medical" className="hover:text-blue-600 transition-colors">Medical</Link></li>
-              <li><Link to="/shop?category=food" className="hover:text-blue-600 transition-colors">Food & Bakery</Link></li>
-              <li><Link to="/shop?category=tech" className="hover:text-blue-600 transition-colors">Tech</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold text-slate-900 mb-3">Delivery</h3>
             <ul className="space-y-2 text-sm text-slate-600">
               <li><Link to="/settings/drone" className="hover:text-blue-600 transition-colors">Drone Delivery</Link></li>
               <li><Link to="/orders" className="hover:text-blue-600 transition-colors">Track Order</Link></li>
-              <li><Link to="/settings/delivery" className="hover:text-blue-600 transition-colors">Locations</Link></li>
+              <li><Link to="/settings/drone" className="hover:text-blue-600 transition-colors">Locations</Link></li>
             </ul>
           </div>
           <div>

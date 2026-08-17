@@ -1,129 +1,125 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
-import { mockProducts } from '../data/mockData';
+import { Search, Filter, SlidersHorizontal, Zap } from 'lucide-react';
+import { INITIAL_PRODUCTS } from '../data/mockData';
 import { ProductCard } from '../components/products/ProductCard';
-import { useCart } from '../context/CartContext';
+import { Button } from '../components/common/Button';
+
+const categories = ['All', 'Groceries', 'Food', 'Medicine', 'Essentials', 'Electronics', 'Personal Care'];
 
 export const ShopPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { addToCart } = useCart();
-  
-  const categoryFilter = searchParams.get('category');
-  const [searchQuery, setSearchQuery] = useState('');
+  const initialCategory = searchParams.get('category') || 'All';
+  const initialSearch = searchParams.get('q') || '';
+
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [droneOnly, setDroneOnly] = useState(false);
 
-  const categories = [
-    { id: 'all', name: 'All Products' },
-    { id: 'medical', name: 'Medical' },
-    { id: 'food', name: 'Food & Bakery' },
-    { id: 'tech', name: 'Tech' },
-    { id: 'essentials', name: 'Essentials' },
-  ];
-
   const filteredProducts = useMemo(() => {
-    return mockProducts.filter(product => {
-      // Category filter (grouping food and bakery together for simplicity in UI if needed, but keeping separate in data)
-      if (categoryFilter && categoryFilter !== 'all') {
-        if (categoryFilter === 'food' && !['food', 'bakery'].includes(product.category)) return false;
-        else if (categoryFilter !== 'food' && product.category !== categoryFilter) return false;
-      }
-      
-      // Drone filter
-      if (droneOnly && !product.isDroneOptimized) return false;
-      
-      // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return product.name.toLowerCase().includes(query) || 
-               product.description.toLowerCase().includes(query) ||
-               product.tags.some(t => t.toLowerCase().includes(query));
-      }
-      
-      return true;
+    return INITIAL_PRODUCTS.filter(p => {
+      const matchCategory = activeCategory === 'All' || p.category === activeCategory;
+      const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchDrone = droneOnly ? p.isDroneOptimized : true;
+      return matchCategory && matchSearch && matchDrone;
     });
-  }, [categoryFilter, droneOnly, searchQuery]);
+  }, [activeCategory, searchQuery, droneOnly]);
 
-  const handleCategoryChange = (id: string) => {
-    if (id === 'all') {
+  const handleCategoryClick = (cat: string) => {
+    setActiveCategory(cat);
+    if (cat === 'All') {
       searchParams.delete('category');
     } else {
-      searchParams.set('category', id);
+      searchParams.set('category', cat);
     }
     setSearchParams(searchParams);
   };
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full flex flex-col gap-8">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Shop</h1>
-        <p className="text-slate-600">Browse our selection of everyday essentials.</p>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        
-        {/* Search */}
-        <div className="relative w-full md:w-96">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-400" />
+    <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-8 min-h-screen">
+      
+      {/* Search and Filters */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="relative flex-1 max-w-lg">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
+            className="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl leading-5 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all sm:text-sm shadow-sm"
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
-          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg shrink-0">
-            {categories.map((cat) => {
-              const isActive = (categoryFilter === cat.id) || (!categoryFilter && cat.id === 'all');
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryChange(cat.id)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                    isActive ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              );
-            })}
-          </div>
-
-          <label className="flex items-center gap-2 shrink-0 cursor-pointer">
-            <input 
-              type="checkbox" 
-              checked={droneOnly}
-              onChange={(e) => setDroneOnly(e.target.checked)}
-              className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 border-slate-300"
-            />
-            <span className="text-sm font-medium text-slate-700">Drone delivery only</span>
-          </label>
+        
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setDroneOnly(!droneOnly)}
+            className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-medium text-sm transition-colors ${
+              droneOnly 
+                ? 'bg-cyan-50 border-cyan-200 text-cyan-700 shadow-sm' 
+                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <Zap className={`w-4 h-4 ${droneOnly ? 'text-cyan-600' : 'text-gray-400'}`} />
+            Drone eligible
+          </button>
+          
+          <button className="flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors">
+            <SlidersHorizontal className="w-4 h-4 text-gray-400" />
+            Sort
+          </button>
         </div>
       </div>
 
-      {/* Product Grid */}
+      {/* Category Chips */}
+      <div className="flex gap-2 overflow-x-auto hide-scrollbar mb-8 pb-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => handleCategoryClick(cat)}
+            className={`whitespace-nowrap px-5 py-2.5 rounded-full font-medium text-sm transition-colors ${
+              activeCategory === cat
+                ? 'bg-gray-900 text-white shadow-sm'
+                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Results Header */}
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-gray-900">
+          {activeCategory === 'All' ? 'All Products' : activeCategory}
+        </h2>
+        <p className="text-gray-500 text-sm mt-1">{filteredProducts.length} items</p>
+      </div>
+
+      {/* Grid */}
       {filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
-              onAddToCart={(p) => addToCart(p, 1)} 
-            />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+          {filteredProducts.map(product => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white rounded-xl border border-slate-200">
-          <Filter className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 mb-1">No products found</h3>
-          <p className="text-slate-500">Try adjusting your search or filters.</p>
+        <div className="text-center py-20 bg-white border border-gray-100 rounded-3xl">
+          <div className="w-16 h-16 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Filter className="w-8 h-8" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No products found</h3>
+          <p className="text-gray-500 mb-6">Try adjusting your filters or search query.</p>
+          <Button onClick={() => {
+            setSearchQuery('');
+            setActiveCategory('All');
+            setDroneOnly(false);
+          }}>
+            Clear all filters
+          </Button>
         </div>
       )}
     </div>

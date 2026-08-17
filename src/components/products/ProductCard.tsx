@@ -1,91 +1,64 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Star, ShoppingCart, Plus, Check } from 'lucide-react';
+import { Zap, Plus, Star } from 'lucide-react';
 import { Product } from '../../types';
-import { Button } from '../common/Button';
-import { Card } from '../common/Card';
-import { Badge } from '../common/Badge';
+import { useCart } from '../../context/CartContext';
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
-  const [added, setAdded] = React.useState(false);
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onAddToCart(product);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
-  };
+export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { addToCart } = useCart();
 
   return (
-    <Link to={`/product/${product.id}`} className="group block h-full">
-      <Card noPadding className="h-full flex flex-col hover:border-blue-300 transition-colors duration-200 overflow-hidden">
-        {/* Image Container */}
-        <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-          <img 
-            src={product.imageUrl} 
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-          {product.originalPrice && (
-            <div className="absolute top-2 left-2">
-              <Badge variant="danger">Sale</Badge>
-            </div>
-          )}
-        </div>
+    <div className="bg-white rounded-[16px] border border-gray-100 overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all group flex flex-col h-full">
+      <Link to={`/product/${product.id}`} className="block relative aspect-[4/3] bg-gray-50 overflow-hidden">
+        <img 
+          src={product.imageUrl} 
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        {product.isDroneOptimized && (
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-md shadow-sm border border-white/50 flex items-center gap-1">
+            <Zap className="w-3 h-3 text-cyan-600" />
+            <span className="text-[10px] font-bold text-gray-800 uppercase tracking-wider">Drone</span>
+          </div>
+        )}
+      </Link>
 
-        {/* Content */}
-        <div className="p-4 flex flex-col flex-1">
-          <div className="flex justify-between items-start mb-1">
-            <h3 className="font-semibold text-slate-900 leading-tight line-clamp-2">
+      <div className="p-4 flex flex-col flex-1">
+        <div className="flex justify-between items-start mb-1">
+          <Link to={`/product/${product.id}`} className="flex-1">
+            <h3 className="font-semibold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors line-clamp-2">
               {product.name}
             </h3>
+          </Link>
+          <div className="flex items-center gap-1 text-sm font-medium text-gray-700 bg-gray-50 px-1.5 py-0.5 rounded ml-2 shrink-0">
+            <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+            {product.rating || "4.5"}
           </div>
-          
-          <div className="flex items-center gap-1 mb-2">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span className="text-xs font-medium text-slate-700">{product.rating}</span>
-            <span className="text-xs text-slate-500">({product.reviewsCount})</span>
-          </div>
-
-          {/* Pricing */}
-          <div className="mt-auto pt-3 flex items-center justify-between">
-            <div className="flex flex-col">
-              <span className="text-lg font-bold text-slate-900">
-                ${product.price.toFixed(2)}
-              </span>
-              {product.originalPrice && (
-                <span className="text-xs text-slate-500 line-through">
-                  ${product.originalPrice.toFixed(2)}
-                </span>
-              )}
-            </div>
-
-            <Button 
-              size="sm" 
-              variant={added ? "success" : "primary"}
-              onClick={handleAdd}
-              className="rounded-full w-9 h-9 p-0 flex items-center justify-center shrink-0"
-              aria-label="Add to cart"
-            >
-              {added ? <Check className="w-4 h-4" /> : <Plus className="w-5 h-5" />}
-            </Button>
-          </div>
-          
-          {/* Drone Delivery Badge */}
-          {product.isDroneOptimized && (
-            <div className="mt-3">
-              <Badge variant="drone" className="text-[10px] py-0">Drone delivery available</Badge>
-            </div>
-          )}
         </div>
-      </Card>
-    </Link>
+
+        <p className="text-sm text-gray-500 mb-3 line-clamp-1">{product.category}</p>
+
+        <div className="mt-auto pt-2 flex items-center justify-between">
+          <div className="font-bold text-gray-900">
+            ${product.price.toFixed(2)}
+          </div>
+          
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              addToCart(product, 1);
+            }}
+            className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors border border-blue-100"
+            aria-label="Add to cart"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
