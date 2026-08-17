@@ -2,19 +2,22 @@ import { fetchApi } from './api';
 import { Order } from '../types';
 
 export const ordersApi = {
-  getOrders: () => {
-    return fetchApi<Order[]>('/orders');
+  getOrders: async () => {
+    const data = await fetchApi<{orders: Order[]}>('/orders');
+    return data.orders;
   },
   
-  getOrder: (id: string) => {
-    return fetchApi<Order>(`/orders/${id}`);
+  getOrder: async (id: string) => {
+    const data = await fetchApi<{order: Order}>(`/orders/${id}`);
+    return data.order;
   },
   
-  createOrder: (orderData: Partial<Order>) => {
-    return fetchApi<Order>('/orders', {
+  createOrder: async (orderData: Partial<Order>) => {
+    const data = await fetchApi<{order: Order}>('/orders', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
+    return data.order;
   },
 
   getOrderTracking: (id: string) => {

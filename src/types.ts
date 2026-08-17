@@ -52,9 +52,9 @@ export interface LocationImage {
   deliveryLocationId: string;
   dataUrl: string;
   sequence: number;
-  directionName: string; // e.g. "North (0°)", "North-East (45°)", etc.
-  heading: number; // 0 - 360 degrees
-  pitch: number; // -90 to +90 degrees
+  directionName: string; // e.g. "Delivery area", "Surroundings 1", etc.
+  heading?: number | null; // 0 - 360 degrees
+  pitch?: number | null; // -90 to +90 degrees
   latitude: number;
   longitude: number;
   accuracy: number;

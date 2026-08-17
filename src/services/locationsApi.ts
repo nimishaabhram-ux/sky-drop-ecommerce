@@ -2,26 +2,30 @@ import { fetchApi } from './api';
 import { DeliveryLocation, LocationImage } from '../types';
 
 export const locationsApi = {
-  getLocations: () => {
-    return fetchApi<DeliveryLocation[]>('/delivery-locations');
+  getLocations: async () => {
+    const data = await fetchApi<{locations: DeliveryLocation[]}>('/delivery-locations');
+    return data.locations;
   },
   
-  getLocation: (id: string) => {
-    return fetchApi<DeliveryLocation>(`/delivery-locations/${id}`);
+  getLocation: async (id: string) => {
+    const data = await fetchApi<{location: DeliveryLocation}>(`/delivery-locations/${id}`);
+    return data.location;
   },
   
-  createLocation: (data: Partial<DeliveryLocation>) => {
-    return fetchApi<DeliveryLocation>('/delivery-locations', {
+  createLocation: async (data: Partial<DeliveryLocation>) => {
+    const res = await fetchApi<{location: DeliveryLocation}>('/delivery-locations', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return res.location;
   },
   
-  updateLocation: (id: string, data: Partial<DeliveryLocation>) => {
-    return fetchApi<DeliveryLocation>(`/delivery-locations/${id}`, {
+  updateLocation: async (id: string, data: Partial<DeliveryLocation>) => {
+    const res = await fetchApi<{location: DeliveryLocation}>(`/delivery-locations/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    return res.location;
   },
   
   deleteLocation: (id: string) => {
@@ -30,10 +34,11 @@ export const locationsApi = {
     });
   },
   
-  setDefaultLocation: (id: string) => {
-    return fetchApi<DeliveryLocation>(`/delivery-locations/${id}/set-default`, {
+  setDefaultLocation: async (id: string) => {
+    const res = await fetchApi<{locations: DeliveryLocation[]}>(`/delivery-locations/${id}/set-default`, {
       method: 'POST',
     });
+    return res.locations.find(l => l.id === id) as DeliveryLocation;
   },
   
   uploadImage: (locationId: string, image: Partial<LocationImage>) => {
